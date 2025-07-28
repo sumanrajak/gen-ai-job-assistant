@@ -1,0 +1,9 @@
+beautifulsoup4
+langchain
+openai
+pandas
+pydantic
+requests
+streamlit
+openpyxl
+# Optional:
