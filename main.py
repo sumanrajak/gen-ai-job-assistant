@@ -4,7 +4,12 @@ import os
 import logging
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
+import datetime
+import pandas as pd
+import json
 
+
+import time
 import streamlit as st
 import streamlit.components.v1 as components # Import components for custom HTML/JS
 from utils.file_io import load_resume # Assuming this exists and works
@@ -15,11 +20,16 @@ from agents.fit_evaluator import FitEvaluatorAgent
 from agents.email_generator import EmailGeneratorAgent
 from agents.org_evaluater import OrgEvaluatorAgent
 from agents.get_recruiter_agent import GetRecruiterAgent
-from ui.ui_components import display_recruiter_details_streamlit_modified # Assuming this is the modified version
+from ui.ui_components import display_recruiter_details_streamlit_modified # Assuming this exists and works
+from ui.ui_components import display_application_records # Assuming this exists and works
+from ui.ui_components import save_application_record # Assuming this exists and works
 
 # --------------------- Config & Logging ---------------------
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Define the path for the Excel database
+
 
 st.set_page_config(page_title="Job Auto Apply", layout="wide")
 
@@ -149,7 +159,7 @@ if 'raw_job_description_text' not in st.session_state:
     st.session_state.raw_job_description_text = ""
 
 # --------------------- Navigation Bar ---------------------
-tab1, tab2 = st.tabs(["Parse Job", "Records"]) # Records tab is a placeholder for now
+tab1, tab2 = st.tabs(["Parse Job", "Records"])
 
 with tab1:
     st.header("Parse Job Listing")
@@ -204,9 +214,14 @@ with tab1:
                                 org_args = (job_info.get("company_name", ""), job_info.get("location_country", ""))
                                 recruiter_args = (job_info.get("company_name", ""), job_info.get("location_country", ""))
 
+                                # Add delay of 2 seconds for each function call
+                                time.sleep(2)
                                 future_fit = executor.submit(fit_agent.run, *fit_args)
+                                time.sleep(2)
                                 future_email = executor.submit(email_agent.run, *email_args)
+                                time.sleep(2)
                                 future_org = executor.submit(org_agent.run, *org_args)
+                                time.sleep(2)
                                 future_recruiter = executor.submit(get_recruiter_agent.run, *recruiter_args)
 
                                 # Collect results
@@ -338,10 +353,72 @@ with tab1:
                     for key, value in org_report.items():
                         st.write(f"**{key.replace('_', ' ').title()}:** {value}")
 
-    # Placeholder for Records tab
-    with tab2:
-        st.header("Job Application Records")
-        st.info("This section will display your past job application records.")
-        # You can add a table or list of past applications here later.
+        # --- Save Button ---
+        st.markdown("---")
+        if st.button("💾 Save Application Record", use_container_width=True, key="save_record_button"):
+            if st.session_state.job_info_data and st.session_state.fit_eval_data and st.session_state.email_gen_data:
+                save_application_record(
+                    st.session_state.job_info_data,
+                    st.session_state.fit_eval_data,
+                    st.session_state.email_gen_data,
+                    st.session_state.org_eval_data,
+                    st.session_state.recruiter_data
+                )
+                st.success("✅ Application record saved successfully!")
+                # Clear current session state after saving to allow new parsing
+                st.session_state.job_info_data = None
+                st.session_state.fit_eval_data = None
+                st.session_state.email_gen_data = None
+                st.session_state.org_eval_data = None
+                st.session_state.recruiter_data = None
+                st.session_state.raw_job_description_text = ""
+                st.rerun() # Rerun to clear the display
+            else:
+                st.warning("⚠️ No complete data to save. Please parse a job first.")
 
 
+with tab2:
+    st.header("Job Application Records")
+    display_application_records()
+
+
+# --------------------- Helper Functions ---------------------
+
+def display_section_grid(header: str, data: dict):
+    """Displays a section of data in the grid layout."""
+    st.subheader(header)
+    for key, value in data.items():
+        if isinstance(value, dict):
+            st.markdown(f"**{key.replace('_', ' ').title()}:**")
+            for sub_key, sub_value in value.items():
+                st.markdown(f"- **{sub_key.replace('_', ' ').title()}:** {sub_value}")
+        elif isinstance(value, list):
+            st.write(f"**{key.replace('_', ' ').title()}:** {', '.join(value)}")
+        else:
+            if value is not None and value != "":
+                st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+
+def display_recruiter_details_streamlit_modified(heading, recruiter_data):
+    """
+    Displays a list of recruiter details in a Streamlit UI, adjusted for cleaner integration.
+    """
+    st.markdown(f"**{heading}:**")
+
+    if not recruiter_data:
+        st.info("No recruiter details to display.")
+        return
+
+    for i, recruiter_url in enumerate(recruiter_data):
+        recruiter_name = f"Recruiter {i+1}"
+        if "/in/" in recruiter_url:
+            parts = recruiter_url.split("/in/")[1].split("/")[0].replace('-', ' ').title()
+            recruiter_name = parts if parts else recruiter_name
+
+        st.markdown(f"**{recruiter_name}**")
+        st.link_button(
+            label="View LinkedIn Profile",
+            url=recruiter_url,
+            help=f"Go to {recruiter_name}'s LinkedIn profile",
+            type="primary"
+        )
+        st.markdown("---") # Separator for each recruiter
