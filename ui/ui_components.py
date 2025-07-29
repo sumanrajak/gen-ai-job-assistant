@@ -109,3 +109,45 @@ def display_recruiter_details_streamlit(heading,recruiter_data):
             # Optional: Add a separator for better visual distinction if not using st.container border
             # if i < len(recruiter_data) - 1:
             #     st.divider()
+
+
+def display_section_grid(header: str, data: dict):
+    st.subheader(header)
+    for key, value in data.items():
+        if isinstance(value, dict):
+            # Recursively display nested dictionaries
+            st.markdown(f"**{key.replace('_', ' ').title()}:**")
+            for sub_key, sub_value in value.items():
+                st.markdown(f"- **{sub_key.replace('_', ' ').title()}:** {sub_value}")
+        elif isinstance(value, list):
+            st.write(f"**{key.replace('_', ' ').title()}:** {', '.join(value)}")
+        else:
+            if value is not None and value != "":
+                st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+
+def display_recruiter_details_streamlit_modified(heading, recruiter_data):
+    """
+    Displays a list of recruiter details in a Streamlit UI, adjusted for cleaner integration.
+    """
+    st.markdown(f"**{heading}:**")
+
+    if not recruiter_data:
+        st.info("No recruiter details to display.")
+        return
+
+    for i, recruiter_url in enumerate(recruiter_data):
+        # Extract a simplified name from the URL if possible, or use index
+        # Example: if URL is linkedin.com/in/john-doe-123, try to get "John Doe"
+        recruiter_name = f"Recruiter {i+1}"
+        if "/in/" in recruiter_url:
+            parts = recruiter_url.split("/in/")[1].split("/")[0].replace('-', ' ').title()
+            recruiter_name = parts if parts else recruiter_name
+
+        st.markdown(f"**{recruiter_name}**")
+        st.link_button(
+            label="View LinkedIn Profile",
+            url=recruiter_url,
+            help=f"Go to {recruiter_name}'s LinkedIn profile",
+            type="primary"
+        )
+        st.markdown("---") # Separator for each recruiter
