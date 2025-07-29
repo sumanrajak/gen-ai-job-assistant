@@ -1,4 +1,3 @@
-# main.py
 
 import os
 import logging
@@ -7,7 +6,6 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError
 import datetime
 import pandas as pd
 import json
-
 
 import time
 import streamlit as st
@@ -27,9 +25,6 @@ from ui.ui_components import save_application_record # Assuming this exists and 
 # --------------------- Config & Logging ---------------------
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-# Define the path for the Excel database
-
 
 st.set_page_config(page_title="Job Auto Apply", layout="wide")
 
@@ -157,6 +152,15 @@ if 'recruiter_data' not in st.session_state:
     st.session_state.recruiter_data = None
 if 'raw_job_description_text' not in st.session_state:
     st.session_state.raw_job_description_text = ""
+if 'agent_status' not in st.session_state:
+    st.session_state.agent_status = {
+        "JobInfoExtractor": "Pending",
+        "FitEvaluatorAgent": "Pending",
+        "EmailGeneratorAgent": "Pending",
+        "OrgEvaluatorAgent": "Pending",
+        "GetRecruiterAgent": "Pending",
+    }
+
 
 # --------------------- Navigation Bar ---------------------
 tab1, tab2 = st.tabs(["Parse Job", "Records"])
@@ -173,73 +177,117 @@ with tab1:
         if not job_text_input:
             st.warning("Please paste the job listing text into the box.")
         else:
+            st.session_state.job_info_data = None
+            st.session_state.fit_eval_data = None
+            st.session_state.email_gen_data = None
+            st.session_state.org_eval_data = None
+            st.session_state.recruiter_data = None
+
             perplexity_key = os.getenv("PERPLEXITY_API_KEY")
             groq_key = os.getenv("GROQ_API_KEY")
 
             if not perplexity_key or not groq_key:
                 st.error("🚨 Missing API keys in .env file. Please check your configuration.")
             else:
-                with st.spinner("⚙️ Processing job listing... This may take a moment..."):
-                    try:
-                        # Initialize LLMs and Agents
-                        perplexity_llm = PerplexityLLM(api_key=perplexity_key)
-                        groq_llm = GroqLLM(api_key=groq_key)
+                # Initialize status display
+                status_placeholder = st.empty()
+                st.session_state.agent_status = {
+                    "JobInfoExtractor": "Starting...",
+                    "FitEvaluatorAgent": "Pending",
+                    "EmailGeneratorAgent": "Pending",
+                    "OrgEvaluatorAgent": "Pending",
+                    "GetRecruiterAgent": "Pending",
+                }
+                status_placeholder.info("⚙️ Processing job listing: Starting agents...")
 
-                        job_agent = JobInfoExtractor(llm=groq_llm)
-                        fit_agent = FitEvaluatorAgent(llm=groq_llm)
-                        email_agent = EmailGeneratorAgent(llm=groq_llm)
-                        org_agent = OrgEvaluatorAgent(llm=perplexity_llm)
-                        get_recruiter_agent = GetRecruiterAgent(llm=perplexity_llm)
 
-                        # Store raw text
+                try:
+                    # Initialize LLMs and Agents
+                    perplexity_llm = PerplexityLLM(api_key=perplexity_key)
+                    groq_llm = GroqLLM(api_key=groq_key)
 
-                        # Thread execution for parallel processing
-                        with ThreadPoolExecutor(max_workers=4) as executor: # Increased workers for more parallelism
-                            future_job = executor.submit(job_agent.run, job_text_input)
+                    job_agent = JobInfoExtractor(llm=groq_llm)
+                    fit_agent = FitEvaluatorAgent(llm=groq_llm)
+                    email_agent = EmailGeneratorAgent(llm=groq_llm)
+                    org_agent = OrgEvaluatorAgent(llm=perplexity_llm)
+                    get_recruiter_agent = GetRecruiterAgent(llm=perplexity_llm)
 
-                            try:
-                                # Job Extractor
-                                job_text, job_info = future_job.result(timeout=180) # Increased timeout
-                                st.session_state.job_info_data = job_info
-                                st.session_state.raw_job_description_text = job_text
+                    # Thread execution for parallel processing
+                    with ThreadPoolExecutor(max_workers=4) as executor:
+                        # Job Extractor
+                        st.session_state.agent_status["JobInfoExtractor"] = "Running: Extracting data from job description..."
+                        status_placeholder.info(f"⚙️ Processing job listing: {st.session_state.agent_status['JobInfoExtractor']}")
+                        future_job = executor.submit(job_agent.run, job_text_input)
 
-                                resume = load_resume()
-                                if not resume:
-                                    st.error("🚫 No resume found! Please ensure 'data/resume.txt' exists and contains your resume.")
-                                    st.stop()
+                        try:
+                            job_text, job_info = future_job.result(timeout=180)
+                            st.session_state.job_info_data = job_info
+                            st.session_state.raw_job_description_text = job_text
+                            st.session_state.agent_status["JobInfoExtractor"] = "Completed"
+                            status_placeholder.info(f"⚙️ Processing job listing: {st.session_state.agent_status['JobInfoExtractor']}")
 
-                                # Prepare arguments for concurrent calls
-                                fit_args = (resume, job_info)
-                                email_args = (resume, job_info)
-                                org_args = (job_info.get("company_name", ""), job_info.get("location_country", ""))
-                                recruiter_args = (job_info.get("company_name", ""), job_info.get("location_country", ""))
 
-                                # Add delay of 2 seconds for each function call
-                                time.sleep(2)
-                                future_fit = executor.submit(fit_agent.run, *fit_args)
-                                time.sleep(2)
-                                future_email = executor.submit(email_agent.run, *email_args)
-                                time.sleep(2)
-                                future_org = executor.submit(org_agent.run, *org_args)
-                                time.sleep(2)
-                                future_recruiter = executor.submit(get_recruiter_agent.run, *recruiter_args)
+                            resume = load_resume()
+                            if not resume:
+                                st.error("🚫 No resume found! Please ensure 'data/resume.txt' exists and contains your resume.")
+                                st.stop()
 
-                                # Collect results
-                                st.session_state.fit_eval_data = future_fit.result(timeout=180)
-                                st.session_state.email_gen_data = future_email.result(timeout=180)
-                                st.session_state.org_eval_data = future_org.result(timeout=180)
-                                st.session_state.recruiter_data = future_recruiter.result(timeout=180)
+                            # Prepare arguments for concurrent calls
+                            fit_args = (resume, job_info)
+                            email_args = (resume, job_info)
+                            org_args = (job_info.get("company_name", ""), job_info.get("location_country", ""))
+                            recruiter_args = (job_info.get("company_name", ""), job_info.get("location_country", ""))
 
-                            except TimeoutError as e:
-                                st.error(f"⏳ An agent timed out: {e}. Please try again or check the input.")
-                                logging.error(f"TimeoutError during agent execution: {e}")
-                            except Exception as e:
-                                st.error(f"❌ An error occurred during processing: {e}")
-                                logging.exception(f"Error during agent execution: {e}")
+                            # Submit other agents with status updates
+                            st.session_state.agent_status["FitEvaluatorAgent"] = "Running: Evaluating resume fit..."
+                            status_placeholder.info(f"⚙️ Processing fit evaluation: {st.session_state.agent_status['FitEvaluatorAgent']}")
+                            future_fit = executor.submit(fit_agent.run, *fit_args)
+                            time.sleep(1)  # Small delay to ensure status updates are visible
+                            st.session_state.agent_status["EmailGeneratorAgent"] = "Running: Generating email and cover letter..."
+                            status_placeholder.info(f"⚙️ Processing email generation: {st.session_state.agent_status['EmailGeneratorAgent']}")
+                            future_email = executor.submit(email_agent.run, *email_args)
+                            time.sleep(1)  # Small delay to ensure status updates are visible
+                            st.session_state.agent_status["OrgEvaluatorAgent"] = "Running: Researching organization details..."
+                            status_placeholder.info(f"⚙️ Processing organization research: {st.session_state.agent_status['OrgEvaluatorAgent']}")
+                            future_org = executor.submit(org_agent.run, *org_args)
+                            time.sleep(1)  # Small delay to ensure status updates are visible
+                            st.session_state.agent_status["GetRecruiterAgent"] = "Running: Searching for recruiter information..."
+                            status_placeholder.info(f"⚙️ Processing recruiter search: {st.session_state.agent_status['GetRecruiterAgent']}")
+                            future_recruiter = executor.submit(get_recruiter_agent.run, *recruiter_args)
 
-                    except Exception as e:
-                        st.error(f"🔥 Critical error during setup or initial processing: {e}")
-                        logging.exception(f"Critical error: {e}")
+                            # Collect results
+                            st.session_state.fit_eval_data = future_fit.result(timeout=180)
+                            st.session_state.agent_status["FitEvaluatorAgent"] = "Completed"
+                            status_placeholder.info(f"⚙️ Processing fit evaluation: {st.session_state.agent_status['FitEvaluatorAgent']}")
+                            time.sleep(1)  # Small delay to ensure status updates are visible
+                            st.session_state.email_gen_data = future_email.result(timeout=180)
+                            st.session_state.agent_status["EmailGeneratorAgent"] = "Completed"
+                            status_placeholder.info(f"⚙️ Processing email generation: {st.session_state.agent_status['EmailGeneratorAgent']}")
+                            time.sleep(1)  # Small delay to ensure status updates are visible
+                            st.session_state.org_eval_data = future_org.result(timeout=180)
+                            st.session_state.agent_status["OrgEvaluatorAgent"] = "Completed"
+                            status_placeholder.info(f"⚙️ Processing organization research: {st.session_state.agent_status['OrgEvaluatorAgent']}")
+                            time.sleep(1)  # Small delay to ensure status updates are visible
+                            st.session_state.recruiter_data = future_recruiter.result(timeout=180)
+                            st.session_state.agent_status["GetRecruiterAgent"] = "running"
+                            status_placeholder.info(f"⚙️ Processing recruiter search: {st.session_state.agent_status['GetRecruiterAgent']}")
+
+                            status_placeholder.success("✅ All agents completed successfully!")
+
+                        except TimeoutError as e:
+                            st.error(f"⏳ An agent timed out: {e}. Please try again or check the input.")
+                            logging.error(f"TimeoutError during agent execution: {e}")
+                            status_placeholder.error("❌ Processing failed due to timeout.")
+                        except Exception as e:
+                            st.error(f"❌ An error occurred during processing: {e}")
+                            logging.exception(f"Error during agent execution: {e}")
+                            status_placeholder.error("❌ Processing failed due to an error.")
+
+                except Exception as e:
+                    st.error(f"🔥 Critical error during setup or initial processing: {e}")
+                    logging.exception(f"Critical error: {e}")
+                    status_placeholder.error("❌ Critical error during setup.")
+
 
     # --- Display Results in Grid Layout ---
     if st.session_state.job_info_data:
@@ -262,7 +310,7 @@ with tab1:
                 st.subheader("💼 Extracted Job Information")
                 job_info = st.session_state.job_info_data
                 for key, value in job_info.items():
-                    if key not in ["Job_Description", "Additional_Info"] and value: # Exclude detailed JD and Additional_Info for this high-level view
+                    if key not in ["Job_Description", "Additional_Info"] and value:
                         st.write(f"**{key.replace('_', ' ')}:** {value}")
                 if job_info.get("Additional_Info"):
                     st.markdown("**Additional Info:**")
@@ -303,7 +351,7 @@ with tab1:
                             return # Skip if no value
 
                         # Unique key for Streamlit widget
-                        widget_key = f"{label.replace(' ', '_').lower()}_{value[:20].replace(' ', '_')}_{hash(value)}"
+                        widget_key = f"{label.replace(' ', '_').lower()}_{str(value)[:20].replace(' ', '_')}_{hash(value)}"
 
                         # Safe escaping for JS clipboard
                         escaped_value = str(value).replace("'", "\\'").replace("\n", "\\n")
