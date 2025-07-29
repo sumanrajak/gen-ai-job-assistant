@@ -27,7 +27,6 @@ class GroqLLM(BaseLLM):
         )
 
         answer = response.choices[0].message.content
-        print("groq llm response:", answer)
         return self._extract_json(answer)
 
     def _extract_json(self, text: str) -> str:

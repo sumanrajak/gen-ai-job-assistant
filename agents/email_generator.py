@@ -41,7 +41,6 @@ class EmailGeneratorAgent:
 
         try:
             result = run_json_prompt(self.llm, EMAIL_COVER_TEMPLATE, prompt_inputs, EMAIL_COVER_SCHEMA)
-            print("email and cover letter generated successfully.", result)
             return result
         except Exception as e:
             print(f"Error during email and cover letter generation: {e}")

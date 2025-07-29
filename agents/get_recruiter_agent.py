@@ -53,7 +53,7 @@ class GetRecruiterAgent:
             dict: A dictionary containing the fit score and skills matched/missing.
 
         """
-        print("Running recruiter agent...")
+        print("Running get recruiter agent...")
         # search_query = f'site:linkedin.com/in/ OR site:linkedin.com/pub/ (hiring manager OR recruiter) "{company_name}" "{location}"'
         # print(f"Searching for: {search_query}")
         # top_results = google_search_top(search_query)

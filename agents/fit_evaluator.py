@@ -38,7 +38,6 @@ class FitEvaluatorAgent:
 
         try:
             result = run_json_prompt(self.llm, FIT_EVALUATOR_PROMPT_TEMPLATE, prompt_inputs, FIT_EVALUATOR_SCHEMA)
-            print("Fit evaluation completed successfully.", result)
             return result
         except Exception as e:
             print(f"Error during fit evaluation: {e}")

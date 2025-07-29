@@ -13,7 +13,6 @@ class JobInfoExtractor:
     def scrape_job_page(self, url: str) -> str:
         if not url.startswith("http"):
             return url
-        print(f"Scraping job page: {url}")
         logging.info(f"Scraping job page: {url}")
         try:
             resp = requests.get(url, timeout=40)
