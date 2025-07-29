@@ -15,7 +15,7 @@ class PerplexityLLM(BaseLLM):
             "Authorization": f"Bearer {self.api_key}"
         }
         data = {
-            "model": "sonar",
+            "model": "sonar-pro",
             "messages": [
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
@@ -36,5 +36,5 @@ class PerplexityLLM(BaseLLM):
             raise
 
     def _extract_json(self, text: str) -> str:
-        match = re.search(r"```json(.*?)```", text, re.DOTALL)
+        match = re.search(r"<json>(.*?)</json>", text, re.DOTALL)
         return match.group(1).strip() if match else text

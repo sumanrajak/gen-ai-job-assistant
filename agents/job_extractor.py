@@ -28,6 +28,7 @@ class JobInfoExtractor:
             raise ValueError("Job page could not be scraped.")
         job_info = run_json_prompt(self.llm, JOB_INFO_PROMPT_TEMPLATE, {
             "job_text": job_text,
-            "job_info_schema": json.dumps(JOB_INFO_SCHEMA)
+            "job_info_schema": json.dumps(JOB_INFO_SCHEMA),
+            "url": url
         }, JOB_INFO_SCHEMA)
         return job_text, job_info

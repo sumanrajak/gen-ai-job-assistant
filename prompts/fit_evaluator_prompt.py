@@ -13,9 +13,10 @@ You are a job fit evaluation assistant.
 
 Compare the following resume and job description. Identify the overlap in skills and requirements.
 
-Respond strictly in JSON format matching this schema:
+Respond strictly inside <json></json> tags in JSON format matching this schema:
+```
 {schema}
-
+```
 Resume:
 {resume}
 
