@@ -1,92 +1,128 @@
 # main.py
+
+import os
+import logging
+from dotenv import load_dotenv
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
+
 import streamlit as st
-from agents.job_extractor import JobInfoExtractor
+from utils.file_io import load_resume
 from llm.perplexity import PerplexityLLM
+from llm.groq import GroqLLM
+from agents.job_extractor import JobInfoExtractor
 from agents.fit_evaluator import FitEvaluatorAgent
 from agents.email_generator import EmailGeneratorAgent
 from agents.org_evaluater import OrgEvaluatorAgent
-from utils.file_io import load_resume
-from dotenv import load_dotenv
-import os
-import json
-import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from llm.groq import GroqLLM
+from agents.get_recruiter_agent import GetRecruiterAgent
+from ui.ui_components import display_section, display_status, display_error_logs, display_recruiter_details_streamlit
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
+# --------------------- Config & Logging ---------------------
 load_dotenv()
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-st.set_page_config(page_title="Job Auto Apply", layout="centered")
+st.set_page_config(page_title="Job Auto Apply", layout="wide")
+st.title("🚀 Job Auto Apply Assistant")
 
-st.title("🚀 Job Auto Apply -/ LLM Assistant ")
+# --------------------- UI Input ---------------------
+job_url = st.text_input("🔗 Enter Job Posting URL")
 
-# Input job URL
-job_url = st.text_input("Enter Job Posting URL")
+# --------------------- State Initialization ---------------------
+if 'agent_status' not in st.session_state:
+    st.session_state.agent_status = {
+        "JobInfoExtractor": "⏳ In Progress",
+        "FitEvaluator": "🛑 Pending",
+        "EmailGenerator": "🛑 Pending",
+        "OrgEvaluator": "🛑 Pending",
+        "GetRecruiter": "🛑 Pending"
+    }
+if 'errors' not in st.session_state:
+    st.session_state.errors = []
 
-if st.button("Extract Job Details") and job_url:
-    if not os.getenv("PERPLEXITY_API_KEY"):
-        st.error("Perplexity API key not found. Please set PERPLEXITY_API_KEY in your .env file.")
-        logging.error("Perplexity API key not found.")
+# --------------------- Process Button ---------------------
+if st.button("🔍 Extract & Evaluate Job") and job_url:
+
+    perplexity_key = os.getenv("PERPLEXITY_API_KEY")
+    groq_key = os.getenv("GROQ_API_KEY")
+
+    if not perplexity_key or not groq_key:
+        st.error("Missing API keys in .env file.")
     else:
-        with st.spinner("Processing... This might take a moment..."):
+        with st.spinner("⚙️ Processing... Please wait..."):
+
             try:
-                llmPRO = PerplexityLLM(api_key=os.getenv("PERPLEXITY_API_KEY"))
-                llm=GroqLLM(api_key=os.getenv("GROQ_API_KEY"))
-                job_agent = JobInfoExtractor(llm=llm)
-                fit_agent = FitEvaluatorAgent(llm=llm)
-                email_agent = EmailGeneratorAgent(llm=llm)
-                org_agent = OrgEvaluatorAgent(llm=llmPRO)
+                # Initialize LLMs and Agents
+                perplexity_llm = PerplexityLLM(api_key=perplexity_key)
+                groq_llm = GroqLLM(api_key=groq_key)
 
-                # Use ThreadPoolExecutor for concurrent execution
+                job_agent = JobInfoExtractor(llm=groq_llm)
+                fit_agent = FitEvaluatorAgent(llm=groq_llm)
+                email_agent = EmailGeneratorAgent(llm=groq_llm)
+                org_agent = OrgEvaluatorAgent(llm=perplexity_llm)
+                get_recruiter_agent = GetRecruiterAgent(llm=perplexity_llm)
+
+                # Thread execution
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    future_job_extraction = executor.submit(job_agent.run, job_url)
+                    st.session_state.agent_status["JobInfoExtractor"] = "⏳ In Progress"
+                    future_job = executor.submit(job_agent.run, job_url)
 
-                    job_text, job_info = None, None
                     try:
-                        job_text, job_info = future_job_extraction.result(timeout=300) # Add a timeout for extraction
-                        st.subheader("Raw Job Description")
-                        st.text_area("Job Text", job_text, height=200)
-                        st.subheader("Structured Job Info")
-                        st.json(job_info)
+                        job_text, job_info = future_job.result(timeout=120)
+                        st.session_state.agent_status["JobInfoExtractor"] = "✅ Done"
+                        display_section("Raw Job Description", {"Text": job_text})
+                        display_section("Structured Job Info", job_info)
 
-                        if job_info: # Only proceed with fit evaluation if job_info was successfully extracted
-                            resume = load_resume()
-                            if resume:
-                                future_fit_evaluation = executor.submit(fit_agent.run, resume, job_info)
-                                email_cover = executor.submit(email_agent.run, resume, job_info)
-                                fit_report = None
-                                try:
-                                    fit_report = future_fit_evaluation.result(timeout=300) # Add a timeout for evaluation
-                                    email_cover_result = email_cover.result(timeout=300) # Add a timeout for email generation
-                                    org_evaluation = org_agent.run(job_info.get("company_name", "SAP"), job_info.get("location_country", "UAE"))
-                                    st.subheader("Fit Evaluation Report")
-                                    st.json(fit_report)
-                                    st.subheader("Email and Cover Letter")
-                                    st.json(email_cover_result)
-                                    st.subheader("Organization Evaluation")
-                                    st.json(org_evaluation)
-                                except TimeoutError:
-                                    st.error("Fit evaluation timed out. Please try again.")
-                                    logging.error("Fit evaluation timed out for URL: %s", job_url)
-                                except Exception as fit_eval_e:
-                                    st.error(f"Error during fit evaluation: {fit_eval_e}")
-                                    logging.exception("Error during fit evaluation for URL: %s", job_url)
-                            else:
-                                st.warning("No resume found. Please ensure 'resume.txt' is in the 'data' directory.")
-                                logging.warning("No resume found when trying to evaluate fit for URL: %s", job_url)
-                        else:
-                            st.error("Could not extract structured job information. Fit evaluation skipped.")
-                            logging.error("Could not extract structured job information for URL: %s", job_url)
+                        resume = load_resume()
+                        if not resume:
+                            st.session_state.errors.append("No resume found in 'data/resume.txt'")
+                            st.stop()
 
-                    except TimeoutError:
-                        st.error("Job extraction timed out. Please check the URL and try again.")
-                        logging.error("Job extraction timed out for URL: %s", job_url)
-                    except Exception as job_extract_e:
-                        st.error(f"Error during job extraction: {job_extract_e}")
-                        logging.exception("Error during job extraction for URL: %s", job_url)
+                        # Run fit + email
+                        st.session_state.agent_status["FitEvaluator"] = "⏳ In Progress"
+                        st.session_state.agent_status["EmailGenerator"] = "⏳ In Progress"
+                        st.session_state.agent_status["GetRecruiter"] = "⏳ In Progress"
+
+                        future_fit = executor.submit(fit_agent.run, resume, job_info)
+                        future_email = executor.submit(email_agent.run, resume, job_info)
+
+                        try:
+                            fit_result = future_fit.result(timeout=120)
+                            email_result = future_email.result(timeout=120)
+                            st.session_state.agent_status["FitEvaluator"] = "✅ Done"
+                            st.session_state.agent_status["EmailGenerator"] = "✅ Done"
+                            st.session_state.agent_status["GetRecruiter"] = "⏳ In Progress"
+
+                            display_section("Fit Evaluation Report", fit_result)
+                            display_section("Email & Cover Letter", email_result)
+
+                        except TimeoutError:
+                            st.session_state.errors.append("Fit or Email Agent timed out.")
+                            st.session_state.agent_status["FitEvaluator"] = "❌ Timeout"
+                            st.session_state.agent_status["EmailGenerator"] = "❌ Timeout"
+
+
+                        # Run org evaluation
+                        st.session_state.agent_status["OrgEvaluator"] = "⏳ In Progress"
+                        try:
+                            org_result = org_agent.run(job_info.get("company_name", ""), job_info.get("location_country", ""))
+                            
+                            recruiter = get_recruiter_agent.run(job_info.get("company_name", ""), job_info.get("location_country", ""))
+                            st.session_state.agent_status["GetRecruiter"] = "✅ Done"
+                            st.session_state.agent_status["OrgEvaluator"] = "✅ Done"
+                            st.session_state.agent_status["GetRecruiter"] = "✅ Done"
+                            display_section("Organization Evaluation", org_result)
+                            display_recruiter_details_streamlit("Recruiter Information",recruiter)
+                        except Exception as e:
+                            st.session_state.errors.append(f"OrgEvaluator failed: {e}")
+                            st.session_state.agent_status["OrgEvaluator"] = "❌ Failed"
+                            st.session_state.agent_status["GetRecruiter"] = "❌ Failed"
+
+                    except Exception as e:
+                        st.session_state.agent_status["JobInfoExtractor"] = "❌ Failed"
+                        st.session_state.errors.append(f"JobInfoExtractor failed: {e}")
 
             except Exception as e:
-                st.error(f"An unexpected error occurred: {e}")
-                logging.exception("An unexpected error occurred in main execution.")
+                st.session_state.errors.append(f"Main workflow error: {e}")
+
+# --------------------- Display Agent Status & Logs ---------------------
+display_status(st.session_state.agent_status)
+display_error_logs(st.session_state.errors)

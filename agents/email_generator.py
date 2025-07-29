@@ -3,6 +3,9 @@ import logging
 from prompts.email_cover_prompt import EMAIL_COVER_SCHEMA, EMAIL_COVER_TEMPLATE
 from utils.prompt_runner import run_json_prompt
 
+
+
+
 class EmailGeneratorAgent:
     def __init__(self, llm):
         """
@@ -27,6 +30,8 @@ class EmailGeneratorAgent:
 
         """
         print("Running FitEvaluatorAgent...")
+
+       
 
         prompt_inputs = {
             "resume": resume,

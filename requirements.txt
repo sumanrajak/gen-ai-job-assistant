@@ -6,4 +6,5 @@ pydantic
 requests
 streamlit
 openpyxl
+googlesearch-python
 # Optional:

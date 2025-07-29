@@ -11,10 +11,12 @@ class JobInfoExtractor:
         self.llm = llm
 
     def scrape_job_page(self, url: str) -> str:
+        if not url.startswith("http"):
+            return url
         print(f"Scraping job page: {url}")
         logging.info(f"Scraping job page: {url}")
         try:
-            resp = requests.get(url, timeout=10)
+            resp = requests.get(url, timeout=40)
             resp.raise_for_status()
             soup = BeautifulSoup(resp.text, "html.parser")
             return soup.body.get_text(separator="\n", strip=True) if soup.body else ""

@@ -5,17 +5,10 @@ ORG_EVALUATER_SCHEMA = {
     "company_research_report": {
         "company_name": "string",
         "company_location": "string",
-        "company_type": "string",
+        "company_size": "string",
+        "company_average_salary_software_engineer": "string",
         "recent_layoffs": "string",
-        "company_culture_summary": "string",
-        "recruiter_details": [
-            {
-                "name": "string",
-                "linkedin_profile_url": "string",
-                "email_address": "string"
-            }
-        ],
-        "data_sources_summary": "string"
+       
     }
 }
 
@@ -48,20 +41,12 @@ Determine if the company is a "Multinational Corporation (MNC)" or a "Startup". 
 4. Recent Layoffs:
 Provide a summary of any recent layoff news (last 12-24 months). If layoffs occurred, mention the approximate date and scale if publicly available. If no significant layoffs are found, state "No significant recent layoffs reported."
 
-5. Company Culture Summary:
-Briefly describe the company culture based on public information (e.g., employee reviews, company values, news articles). Focus on aspects relevant to a potential employee (e.g., work-life balance, innovation, collaboration, employee development).
+5. Company Size:
+Determine the approximate size of the company 
+6. Average Salary for Software Engineers:
+Provide the average salary for software engineers at the company, if available. If not found, state
+"Not found through public search." If available, include the source of the salary data (e.g., Glassdoor, Payscale).
 
-6. Recruiter Details:
-Search for public recruiter information. Aim to find 1-3 relevant recruiters. For each:
-
-Name: The recruiter's full name.
-
-LinkedIn Profile URL: The direct URL to their LinkedIn profile.
-
-Email Address: Their professional email address, if publicly available. If not found, state "Not publicly available."
-
-7. Data Sources Summary:
-Briefly mention the types of sources consulted (e.g., "Company website, LinkedIn, Glassdoor, news articles, industry publications"). Do not list specific URLs or titles, just a general summary of source types.
 ** [IMPORTANT]** all generated text should be plane text in single line without any formatting or markdown.
 **[IMPORTANT]Respond strictly inside <json> </json> tags in JSON format matching this schema:**
 {schema}
