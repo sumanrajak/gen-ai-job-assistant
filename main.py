@@ -35,7 +35,7 @@ st.markdown("""
         background: #0E1117; /* Dark background */
     }
     .main .block-container {
-        padding-top: 2rem;
+        padding-top: 20rem;
         padding-right: 2rem;
         padding-left: 2rem;
         padding-bottom: 2rem;
@@ -137,7 +137,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.title("🚀 Job Auto Apply Assistant")
+# st.title("🚀 Job Auto Apply Assistant")
 
 # --------------------- State Initialization ---------------------
 if 'job_info_data' not in st.session_state:

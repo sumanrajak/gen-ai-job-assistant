@@ -157,51 +157,97 @@ def display_recruiter_details_streamlit_modified(heading, recruiter_data):
         )
         st.markdown("---") # Separator for each recruiter
 
+
+
 def display_application_records():
-    """Fetches and displays saved application records from Excel."""
+    """Fetches and displays saved application records from a selected Excel sheet."""
+
     if not os.path.exists(EXCEL_DB_PATH):
         st.info("No saved application records found yet.")
         return
 
     try:
-        df = pd.read_excel(EXCEL_DB_PATH)
+        # Load all sheet names from the Excel file
+        excel_file = pd.ExcelFile(EXCEL_DB_PATH, engine='openpyxl')
+        sheet_names = excel_file.sheet_names
+
+        if not sheet_names:
+            st.info("No sheets found in the Excel file.")
+            return
+
+        # Create a dropdown to select the sheet (country)
+        selected_sheet = st.selectbox(
+            "Select Location (Country):",
+            options=sheet_names,
+            index=0 # Default to the first sheet
+        )
+
+        # Read the DataFrame from the selected sheet
+        df = pd.read_excel(EXCEL_DB_PATH, sheet_name=selected_sheet, engine='openpyxl')
 
         if df.empty:
-            st.info("No saved application records found yet.")
+            st.info(f"No saved application records found in the '{selected_sheet}' sheet yet.")
             return
 
         # Sort by date saved, newest first
-        df["Date Saved"] = pd.to_datetime(df["Date Saved"])
+        # Convert 'Date Saved' to datetime objects for proper sorting if it's not already
+        df["Date Saved"] = pd.to_datetime(df["Date Saved"], errors='coerce') # 'coerce' turns invalid dates into NaT
         df = df.sort_values(by="Date Saved", ascending=False).reset_index(drop=True)
 
+        st.subheader(f"Records for {selected_sheet}")
+
+        # Iterate and display records for the selected sheet
         for index, row in df.iterrows():
             job_title = row.get("Job_Title", "N/A")
             company_name = row.get("company_name", "N/A")
-            date_saved = row.get("Date Saved", pd.NaT).strftime("%Y-%m-%d") if pd.notna(row.get("Date Saved")) else "N/A"
+            # Format date only if it's a valid datetime object
+            date_saved = row.get("Date Saved", pd.NaT)
+            date_saved_str = date_saved.strftime("%Y-%m-%d") if pd.notna(date_saved) else "N/A"
             location = row.get("location", "N/A")
             job_id = row.get("job_id", "N/A")
             is_applied = row.get("is_applied", False)
 
-
-            header_text = f"{' ✅ ' if is_applied else ''}  " \
-                          f"[{job_id } ] - " \
-                          f"{company_name}  -  " \
-                          f"[ {job_title}] -  " \
-                          f"{date_saved}    -   {location[:10]}{'...' if len(location) > 10 else ''}"
+            header_text = (
+                f"{' ✅ ' if is_applied else ''} "
+                f"[{job_id}] - "
+                f"{company_name} - "
+                f"[ {job_title}] - "
+                f"{date_saved_str} - "
+                f"{location[:20]}{'...' if len(location) > 20 else ''}" # Increased location display
+            )
 
             with st.expander(header_text):
+                # Ensure the 'Mark as Applied' button interacts correctly with the specific sheet
                 if is_applied:
                     st.success("Application already marked as applied.")
                 else:
-                    if st.button("Mark as Applied", key=f"apply_button_{index}"):
-                        # Update the Excel file to set 'is_applied' to True for the current record
+                    # Use a unique key for the button based on index AND selected_sheet
+                    if st.button("Mark as Applied", key=f"apply_button_{selected_sheet}_{index}"):
+                        # Update the DataFrame in memory
                         df.loc[index, 'is_applied'] = True
                         try:
-                            df.to_excel(EXCEL_DB_PATH, index=False)
-                            st.success("Application marked as applied.")
+                            # To update a specific sheet without affecting others, we need to
+                            # re-read all sheets, update the specific one, and then re-write the entire file.
+                            # This is crucial because `to_excel` in 'replace' mode only works on a single sheet
+                            # and doesn't preserve other sheets when not in append mode on the file.
+
+                            # Load the entire workbook again
+                            workbook_data = {sheet: pd.read_excel(EXCEL_DB_PATH, sheet_name=sheet, engine='openpyxl')
+                                             for sheet in excel_file.sheet_names}
+
+                            # Update the DataFrame for the current sheet
+                            workbook_data[selected_sheet] = df
+
+                            # Write all sheets back to the Excel file
+                            with pd.ExcelWriter(EXCEL_DB_PATH, engine='openpyxl') as writer:
+                                for sheet_name_to_write, sheet_df in workbook_data.items():
+                                    sheet_df.to_excel(writer, sheet_name=sheet_name_to_write, index=False)
+
+                            st.success("Application marked as applied. Please re-select the sheet to see the update.")
+                            st.experimental_rerun() # Rerun to reflect the change immediately
                         except Exception as e:
                             st.error(f"❌ Error updating application record: {e}")
-                            logging.exception("Error updating Excel record: ", e)
+                            logging.exception("Error updating Excel record:")
 
                 st.subheader("🎯 Job Fit Evaluation")
                 st.write(f"**Fit Score:** {row.get('fit_score', 'N/A')}/10.0")
@@ -217,32 +263,38 @@ def display_application_records():
                 if row.get("email_cold_subject"):
                     st.markdown("**Cold Email:**")
                     st.write(f"**Subject:** {row.get('email_cold_subject', 'N/A')}")
-                    st.text_area("Body (Cold Email)", value=row.get('email_cold_body', 'N/A'), height=150, disabled=True, key=f"cold_email_body_{index}")
-                
+                    st.text_area("Body (Cold Email)", value=row.get('email_cold_body', 'N/A'), height=150, disabled=True, key=f"cold_email_body_{selected_sheet}_{index}")
+
                 if row.get("cover_letter_body"):
                     st.markdown("**Cover Letter:**")
-                    st.text_area("Body (Cover Letter)", value=row.get('cover_letter_body', 'N/A'), height=300, disabled=True, key=f"cover_letter_body_{index}")
+                    st.text_area("Body (Cover Letter)", value=row.get('cover_letter_body', 'N/A'), height=300, disabled=True, key=f"cover_letter_body_{selected_sheet}_{index}")
 
                 if row.get("linkedin_message_recruiter"):
                     st.markdown("**LinkedIn Message (Recruiter):**")
-                    st.text_area("Body (Recruiter)", value=row.get('linkedin_message_recruiter', 'N/A'), height=100, disabled=True, key=f"linkedin_recruiter_{index}")
+                    st.text_area("Body (Recruiter)", value=row.get('linkedin_message_recruiter', 'N/A'), height=100, disabled=True, key=f"linkedin_recruiter_{selected_sheet}_{index}")
 
                 if row.get("linkedin_message_referrer"):
                     st.markdown("**LinkedIn Message (Referrer):**")
-                    st.text_area("Body (Referrer)", value=row.get('linkedin_message_referrer', 'N/A'), height=100, disabled=True, key=f"linkedin_referrer_{index}")
-                
+                    st.text_area("Body (Referrer)", value=row.get('linkedin_message_referrer', 'N/A'), height=100, disabled=True, key=f"linkedin_referrer_{selected_sheet}_{index}")
+
                 # Optionally display recruiter URLs and organization data
                 recruiter_urls = []
                 try:
-                    recruiter_urls = json.loads(row.get("recruiter_linkedin_urls", "[]"))
+                    # Ensure it tries to load from a string, not a float if 'N/A' or similar is passed
+                    recruiter_data_raw = row.get("recruiter_linkedin_urls", "[]")
+                    if isinstance(recruiter_data_raw, str):
+                        recruiter_urls = json.loads(recruiter_data_raw)
+                    else: # Handle cases where it might be NaN or other non-string types
+                        recruiter_urls = []
                 except json.JSONDecodeError:
+                    logging.warning(f"JSON Decode Error for recruiter_linkedin_urls at index {index}: {recruiter_data_raw}")
                     pass # Handle cases where it might not be valid JSON
 
                 if recruiter_urls:
                     st.markdown("---")
                     st.subheader("👤 Recruiter Information")
-                    for r_url in recruiter_urls:
-                        r_name = r_url.split("/in/")[1].split("/")[0].replace('-', ' ').title() if "/in/" in r_url else "N/A"
+                    for i, r_url in enumerate(recruiter_urls):
+                        r_name = r_url.split("/in/")[1].split("/")[0].replace('-', ' ').title() if "/in/" in r_url else f"Recruiter {i+1}"
                         st.write(f"**LinkedIn Profile ({r_name}):** [Link]({r_url})")
 
                 if row.get("org_company_name"):
@@ -254,11 +306,13 @@ def display_application_records():
                     st.write(f"**Avg. SE Salary:** {row.get('org_avg_salary_se', 'N/A')}")
                     st.write(f"**Recent Layoffs:** {row.get('org_recent_layoffs', 'N/A')}")
 
-
+    except FileNotFoundError:
+        st.error(f"❌ Error: The Excel file '{EXCEL_DB_PATH}' was not found.")
+    except PermissionError:
+        st.error(f"❌ Permission denied. Please close the Excel file '{EXCEL_DB_PATH}' if it's open.")
     except Exception as e:
-        st.error(f"❌ Error loading application records: {e}")
-        logging.exception("Error reading Excel DB")
-
+        st.error(f"❌ An unexpected error occurred while loading records: {e}")
+        logging.exception("Error reading Excel DB for display:")
 
 def save_application_record(job_info, fit_eval, email_gen, org_eval, recruiter_data):
     """Saves all extracted and generated data to an Excel sheet."""
@@ -288,17 +342,45 @@ def save_application_record(job_info, fit_eval, email_gen, org_eval, recruiter_d
         "is_applied": False,  # Default to False, can be updated later
         # You can add more fields from JOB_INFO_SCHEMA, ORG_EVALUATER_SCHEMA if needed
     }
-    print(record)
+    print("Record to be saved:", record) # For debugging
 
-    df = pd.DataFrame([record])
+    new_record_df = pd.DataFrame([record])
+    print("DataFrame for new record:\n", new_record_df) # For debugging
 
-    print(df)
+    # Determine the sheet name, using 'Other' as a fallback if country is not available
+    sheet_name = job_info.get("location_country", "Other")
+    if not sheet_name: # Handle cases where location_country might be an empty string
+        sheet_name = "Other"
 
-    if os.path.exists(EXCEL_DB_PATH):
-        # Read existing data and append
-        existing_df = pd.read_excel(EXCEL_DB_PATH)
-        df = pd.concat([existing_df, df], ignore_index=True)
-    
-    # Save to Excel
-    df.to_excel(EXCEL_DB_PATH, index=False)
+    try:
+        if os.path.exists(EXCEL_DB_PATH):
+            # Read existing sheets to maintain their content
+            with pd.ExcelWriter(EXCEL_DB_PATH, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+                # Iterate through existing sheets to preserve them
+                excel_file = pd.ExcelFile(EXCEL_DB_PATH, engine='openpyxl')
+                for existing_sheet in excel_file.sheet_names:
+                    if existing_sheet != sheet_name: # Don't re-write the target sheet yet
+                        existing_df = pd.read_excel(EXCEL_DB_PATH, sheet_name=existing_sheet, engine='openpyxl')
+                        existing_df.to_excel(writer, sheet_name=existing_sheet, index=False)
+
+                # Now handle the target sheet
+                if sheet_name in excel_file.sheet_names:
+                    existing_data_for_sheet = pd.read_excel(EXCEL_DB_PATH, sheet_name=sheet_name, engine='openpyxl')
+                    combined_df = pd.concat([existing_data_for_sheet, new_record_df], ignore_index=True)
+                    combined_df.to_excel(writer, sheet_name=sheet_name, index=False)
+                else:
+                    new_record_df.to_excel(writer, sheet_name=sheet_name, index=False)
+        else:
+            # If the file doesn't exist, create it with the new record
+            with pd.ExcelWriter(EXCEL_DB_PATH, engine='openpyxl') as writer:
+                new_record_df.to_excel(writer, sheet_name=sheet_name, index=False)
+        print(f"Record successfully saved to {EXCEL_DB_PATH} in sheet '{sheet_name}'.")
+
+    except FileNotFoundError:
+        print(f"Error: The Excel file '{EXCEL_DB_PATH}' was not found.")
+    except PermissionError:
+        print(f"Error: Permission denied. Please close the Excel file '{EXCEL_DB_PATH}' if it's open.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
 
