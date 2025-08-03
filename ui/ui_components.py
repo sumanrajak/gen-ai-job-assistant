@@ -179,10 +179,30 @@ def display_application_records():
             company_name = row.get("company_name", "N/A")
             date_saved = row.get("Date Saved", pd.NaT).strftime("%Y-%m-%d") if pd.notna(row.get("Date Saved")) else "N/A"
             location = row.get("location", "N/A")
+            job_id = row.get("job_id", "N/A")
+            is_applied = row.get("is_applied", False)
 
-            header_text = f"**{job_title}** at **{company_name}** - Saved on {date_saved} in {location}"
+
+            header_text = f"{' ✅ ' if is_applied else ''}  " \
+                          f"[{job_id } ] - " \
+                          f"{company_name}  -  " \
+                          f"[ {job_title}] -  " \
+                          f"{date_saved}    -   {location[:10]}{'...' if len(location) > 10 else ''}"
 
             with st.expander(header_text):
+                if is_applied:
+                    st.success("Application already marked as applied.")
+                else:
+                    if st.button("Mark as Applied", key=f"apply_button_{index}"):
+                        # Update the Excel file to set 'is_applied' to True for the current record
+                        df.loc[index, 'is_applied'] = True
+                        try:
+                            df.to_excel(EXCEL_DB_PATH, index=False)
+                            st.success("Application marked as applied.")
+                        except Exception as e:
+                            st.error(f"❌ Error updating application record: {e}")
+                            logging.exception("Error updating Excel record: ", e)
+
                 st.subheader("🎯 Job Fit Evaluation")
                 st.write(f"**Fit Score:** {row.get('fit_score', 'N/A')}/10.0")
                 st.write(f"**Matched Skills:** {row.get('fit_matched_skills', 'N/A')}")
@@ -192,6 +212,8 @@ def display_application_records():
                 st.markdown("---")
 
                 st.subheader("✉️ Communication Data")
+                if row.get("job_url"):
+                    st.markdown(f"**Job URL:** [Link]({row.get('job_url', 'N/A')})")
                 if row.get("email_cold_subject"):
                     st.markdown("**Cold Email:**")
                     st.write(f"**Subject:** {row.get('email_cold_subject', 'N/A')}")
@@ -243,6 +265,7 @@ def save_application_record(job_info, fit_eval, email_gen, org_eval, recruiter_d
     record = {
         "Date Saved": datetime.date.today().isoformat(),
         "Job_Title": job_info.get("Job_Title", ""),
+        "job_id": job_info.get("job_id", ""),
         "company_name": job_info.get("company_name", ""),
         "location": job_info.get("location", ""),
         "location_country": job_info.get("location_country", ""),
@@ -262,10 +285,14 @@ def save_application_record(job_info, fit_eval, email_gen, org_eval, recruiter_d
         "org_avg_salary_se": org_eval.get("company_research_report", {}).get("company_average_salary_software_engineer", ""),
         "org_recent_layoffs": org_eval.get("company_research_report", {}).get("recent_layoffs", ""),
         "recruiter_linkedin_urls": json.dumps(recruiter_data) if recruiter_data else "[]", # Store as JSON string
+        "is_applied": False,  # Default to False, can be updated later
         # You can add more fields from JOB_INFO_SCHEMA, ORG_EVALUATER_SCHEMA if needed
     }
+    print(record)
 
     df = pd.DataFrame([record])
+
+    print(df)
 
     if os.path.exists(EXCEL_DB_PATH):
         # Read existing data and append

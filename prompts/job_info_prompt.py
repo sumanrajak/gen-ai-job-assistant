@@ -38,6 +38,7 @@ skills and experience required  in the summary word limit 500 to 600.
 * **Perks:** Extract any benefits or perks offered by the company, such as health insurance
 , retirement plans, remote work options, etc.
 visa sponsorship and relocation provided should be mentioned if mentioned in the job description.
+job_id should be extracted from the url if available or from the job description. or randomly generate a unique id if not available.
 * ** extract url info** try to extact info from {url} like job_id .
 
 Respond strictly inside <json></json> tags in JSON format matching this schema:

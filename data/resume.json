@@ -7,13 +7,16 @@
       "linkedin": "https://linkedin.com/in/sumanrajak",
       "portfolio": "https://meetsuman.vercel.app"
     },
-    "summary": "Full Stack & AI Engineer with 4 years of experience delivering scalable web applications and cutting-edge Generative AI solutions. Proven leader in full-stack development (FastAPI, Python, React) within robust cloud environments (AWS) and scalable database solutions. Expertise spans advanced Generative AI capabilities, including RAG, LLM integration, vector databases, and embedding-based search. Track record of leading modules, providing technical solutions, and building production-grade, end-to-end AI-powered features with optimized backend performance.",
+    "summary": "Full Stack & AI Engineer with 4+ years of experience delivering scalable web applications and cutting-edge Generative AI solutions. Proven leader in full-stack development (FastAPI, Python, React) within robust cloud environments (AWS) and scalable database solutions. Expertise spans advanced Generative AI capabilities, including RAG, LLM integration, vector databases, and embedding-based search. Track record of leading modules, providing technical solutions, and building production-grade, end-to-end AI-powered features with optimized backend performance.",
     "technical_skills": {
       "languages": ["Python", "JavaScript (ES6+)", "TypeScript", "C++", "C", "HTML5", "CSS3"],
-      "frameworks_libraries": ["React", "Next.js", "Nest.js", "FastAPI", "Flask", "LangChain", "TensorFlow"],
+      "frameworks_libraries": ["React", "Next.js", "Nest.js", "FastAPI", "Flask", "LangChain", "TensorFlow", "Electron.js"],
       "databases": ["MSSQL", "MySQL", "MongoDB", "DynamoDB", "Oracle"],
-      "cloud_devops": ["AWS (EC2, Lambda, S3, AppSync, Bedrock, OpenSearch)", "Docker"],
-      "ai_ml": ["Generative AI", "RAG", "Embeddings", "AWS Bedrock", "OpenSearch similarity search", "AI Agents", "CNN/RNN", "Hugging Face"]
+      "cloud_devops": ["AWS (EC2, Lambda, S3, AppSync, Bedrock, OpenSearch)"],
+      "ai_ml": ["Generative AI", "RAG", "Embeddings", "AWS Bedrock", "OpenSearch similarity search", "AI Agents", "CNN/RNN", "Hugging Face"],
+      "tools_technologies": ["Git", "Postman", "Jira", "VS Code", "Figma", "Swagger", "Linux"],
+      "methodologies": ["Agile", "Scrum", "TDD"],
+      "other_skills": ["RESTful APIs", "GraphQL", "Microservices", "Unit Testing", "Performance Optimization" ]
     },
     "professional_experience": [
       {
@@ -62,12 +65,7 @@
           "Contributed to major client projects (Mamaearth, Lotus) ensuring UI consistency."
         ]
       }
-    ],
-    "education": {
-      "institution": "KIIT University",
-      "degree": "B.Tech in Information Technology",
-      "duration": "2018 - 2022",
-      "cgpa": "8.2"
-    }
+    ]
+    
   }
   
