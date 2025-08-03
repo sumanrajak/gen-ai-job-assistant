@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saved Job Applications</title>
+</head>
+<body>
+    <h1>📁 Saved Job Applications</h1>
+    <ul>
+        {% for job in jobs %}
+            <li><strong>{{ job.title }}</strong> @ {{ job.company }} — Status: {{ job.status }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

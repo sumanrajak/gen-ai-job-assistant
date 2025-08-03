@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Job Applications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen w-full">
+
+    <!-- Main Container -->
+    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full max-w-7xl h-full mt-8 mb-8 border border-gray-200">
+        <!-- Header -->
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center flex items-center justify-center mb-6">
+            <span class="text-indigo-600 mr-3">
+                <i class="fas fa-folder-open"></i>
+            </span>
+            Saved Job Applications
+        </h1>
+
+        <!-- Search and Filter Controls -->
+        <div class="flex flex-col gap-4 mb-6">
+            <!-- Search Bar -->
+            <div class="relative w-full">
+                <input type="text" id="search-bar" placeholder="Search for jobs..."
+                       class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+
+            <!-- Country Tabs -->
+            <div id="country-tabs" class="flex flex-wrap justify-start gap-2 text-sm">
+                <!-- Tabs will be injected here -->
+            </div>
+        </div>
+
+        <!-- Custom Message Box -->
+        <div id="messageBox" class="fixed top-4 right-4 z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+            <div class="p-4 rounded-xl shadow-lg font-semibold text-white bg-green-500">
+                <i class="fas fa-check-circle mr-2"></i> Job marked as applied!
+            </div>
+        </div>
+        
+        <!-- Accordion Container -->
+        <div class="space-y-4" id="jobAccordion">
+            <!-- Jobs will be injected here -->
+            <div class="p-6 text-center text-gray-500">Loading saved jobs...</div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data to simulate the API response
+        const allJobsData = [
+            {
+                "job_id": "job123",
+                "Job_Title": "Senior Software Engineer",
+                "company_name": "Innovate Corp",
+                "location": "Remote",
+                "location_country": "USA",
+                "job_url": "https://example.com/job/123",
+                "fit_score": 85,
+                "Date Saved": "2023-10-26",
+                "fit_matched_skills": "Python, AWS, Docker",
+                "fit_missing_skills": "Go, Terraform",
+                "fit_summary": "Strong background in backend development and cloud technologies. Focus on showcasing experience with microservices and leadership.",
+                "email_cold_subject": "Application for Senior Software Engineer - [Your Name]",
+                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am writing to express my enthusiastic interest in the Senior Software Engineer position at Innovate Corp. With over 7 years of experience developing scalable systems using Python, AWS, and Docker, my skills are a strong match for your team's needs.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]",
+                "cover_letter_body": "Dear [Hiring Manager Name],\n\nI am writing to apply for the Senior Software Engineer role at Innovate Corp. My extensive background in building high-performance backend systems, coupled with expertise in Python, cloud technologies like AWS, and containerization with Docker and Kubernetes, makes me an ideal candidate for this position.\n\nThank you for your time and consideration.\n\nSincerely,\n[Your Name]",
+                "linkedin_message_recruiter": "Hi [Recruiter Name], I came across the Senior Software Engineer position at Innovate Corp on LinkedIn and was very impressed with the company's work. With my background in Python and AWS, I believe I could be a great fit. I'd love to connect and learn more about the team. Thanks, [Your Name].",
+                "linkedin_message_referrer": "Hello [Referrer Name], I'm a Senior Software Engineer with a strong background in scalable systems and cloud architecture. I'm applying for the Senior Software Engineer role at Innovate Corp and would appreciate any insights you might have. Best, [Your Name].",
+                "org_company_name": "Innovate Corp",
+                "org_company_location": "San Francisco, CA",
+                "org_company_size": "201-500 employees",
+                "org_avg_salary_se": "$150,000 - $180,000",
+                "org_recent_layoffs": "No recent layoffs reported.",
+                "recruiter_linkedin_urls": ["https://www.linkedin.com/in/recruiter-at-innovate-corp", "https://www.linkedin.com/in/hiring-manager-innovate"],
+                "is_applied": false
+            },
+            {
+                "job_id": "job456",
+                "Job_Title": "Data Scientist",
+                "company_name": "Quant Labs",
+                "location": "New York, NY",
+                "location_country": "USA",
+                "job_url": "https://example.com/job/456",
+                "fit_score": 62,
+                "Date Saved": "2023-10-25",
+                "fit_matched_skills": "Python, R, Machine Learning",
+                "fit_missing_skills": "Big Data, SQL",
+                "fit_summary": "Solid foundation in data science, but needs to highlight experience with large-scale data processing and database skills.",
+                "email_cold_subject": "Inquiry for Data Scientist position",
+                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am a Data Scientist with a passion for quantitative analysis and a strong foundation in Python and R. Your work at Quant Labs on market prediction models caught my eye, and I believe my skills are well-suited to contribute to your team. I have attached my resume for your review.\n\nSincerely,\n[Your Name]",
+                "cover_letter_body": "Dear [Hiring Manager Name],\n\nI am writing to express my interest in the Data Scientist position at Quant Labs. My experience includes developing predictive models and analyzing large datasets to drive business insights. I am eager to apply my analytical skills and contribute to your team's innovative projects.\n\nSincerely,\n[Your Name]",
+                "linkedin_message_recruiter": "Hi [Recruiter Name], I saw the Data Scientist role at Quant Labs and was immediately interested. My background in machine learning and Python aligns well with the requirements, and I'd love to learn more. Thanks, [Your Name].",
+                "linkedin_message_referrer": "Hello [Referrer Name], I'm a Data Scientist who is applying for a role at Quant Labs. I was hoping you might have a moment to share your experience working there. I'd appreciate any advice you have. Thanks, [Your Name].",
+                "org_company_name": "Quant Labs",
+                "org_company_location": "New York, NY",
+                "org_company_size": "51-200 employees",
+                "org_avg_salary_se": "$130,000 - $160,000",
+                "org_recent_layoffs": "Recent layoffs in the AI division.",
+                "recruiter_linkedin_urls": ["https://www.linkedin.com/in/recruiter-quant-labs"],
+                "is_applied": true
+            },
+            {
+                "job_id": "job789",
+                "Job_Title": "Frontend Developer",
+                "company_name": "Pixel Perfect Inc.",
+                "location": "San Francisco, CA",
+                "location_country": "USA",
+                "job_url": "https://example.com/job/789",
+                "fit_score": 35,
+                "Date Saved": "2023-10-24",
+                "fit_matched_skills": "HTML, CSS, JavaScript",
+                "fit_missing_skills": "React, Vue.js",
+                "fit_summary": "Basic skills are a match, but the role requires significant experience with modern JavaScript frameworks.",
+                "email_cold_subject": "Application for Frontend Developer",
+                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am writing to apply for the Frontend Developer position. While I have a solid foundation in core web technologies, I am actively building my skills in modern frameworks like React and Vue. I am a fast learner and am excited by the opportunity to grow with your team.\n\nSincerely,\n[Your Name]",
+                "cover_letter_body": "Dear [Hiring Manager Name],\n\nI am a passionate Frontend Developer with experience in creating responsive and accessible websites using HTML, CSS, and JavaScript. I am eager to bring my creative problem-solving skills to Pixel Perfect Inc. and contribute to your visual-first approach to web development.\n\nSincerely,\n[Your Name]",
+                "linkedin_message_recruiter": "Hi [Recruiter Name], I'm a Frontend Developer and saw the opening on your team at Pixel Perfect Inc. I'd love to connect and hear more about the role and the company culture. Best, [Your Name].",
+                "linkedin_message_referrer": null, // Example of a missing field
+                "org_company_name": "Pixel Perfect Inc.",
+                "org_company_location": "San Francisco, CA",
+                "org_company_size": "500+ employees",
+                "org_avg_salary_se": "$100,000 - $120,000",
+                "org_recent_layoffs": "Layoffs reported in marketing and design departments.",
+                "recruiter_linkedin_urls": [], // Example of an empty array
+                "is_applied": false
+            },
+             {
+                "job_id": "job101",
+                "Job_Title": "Marketing Manager",
+                "company_name": "Global Marketing Solutions",
+                "location": "London, UK",
+                "location_country": "UK",
+                "job_url": "https://example.com/job/101",
+                "fit_score": 92,
+                "Date Saved": "2023-10-23",
+                "fit_matched_skills": "Digital Marketing, SEO, Content Strategy",
+                "fit_missing_skills": "PPC, Data Analytics",
+                "fit_summary": "Excellent fit for digital marketing expertise. Highlight past successes in content strategy and team leadership.",
+                "email_cold_subject": "Inquiry for Marketing Manager - [Your Name]",
+                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am reaching out to express my keen interest in the Marketing Manager role at Global Marketing Solutions. My background in developing and executing comprehensive digital marketing strategies, coupled with my experience in SEO and content, aligns perfectly with the requirements of this role.\n\nThank you for your time and consideration.\n\nBest regards,\n[Your Name]",
+                "cover_letter_body": "Dear [Hiring Manager Name],\n\nAs an experienced marketing professional with a proven track record of driving brand growth through innovative digital strategies, I am excited to apply for the Marketing Manager position at Global Marketing Solutions. My portfolio demonstrates my ability to lead successful campaigns and build strong online presences.\n\nSincerely,\n[Your Name]",
+                "linkedin_message_recruiter": "Hi [Recruiter Name], I'm very interested in the Marketing Manager opening at Global Marketing Solutions. My experience in digital marketing and content strategy aligns well with the role. I'd love to connect and discuss how I can contribute to your team. Thanks, [Your Name].",
+                "linkedin_message_referrer": "Hello [Referrer Name], I'm a marketing professional applying for a role at Global Marketing Solutions and was hoping for some insights into the company culture and team dynamics. I'd be grateful for a brief chat. Best, [Your Name].",
+                "org_company_name": "Global Marketing Solutions",
+                "org_company_location": "London, UK",
+                "org_company_size": "51-200 employees",
+                "org_avg_salary_se": "£60,000 - £80,000",
+                "org_recent_layoffs": "No recent layoffs reported.",
+                "recruiter_linkedin_urls": ["https://www.linkedin.com/in/recruiter-g-m-s"],
+                "is_applied": false
+            }
+        ];
+
+        let currentCountryFilter = 'All';
+        let currentSearchQuery = '';
+
+        // Mock API functions
+        async function fetchCountriesApi() {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 300));
+            return [...new Set(allJobsData.map(job => job.location_country))];
+        }
+
+        async function fetchJobsApi() {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const response = await fetch("/api/saved-jobs");
+
+        if (!response.ok) {
+        document.getElementById("jobAccordion").innerHTML = "<p class='p-6 text-center text-red-500'>❌ Failed to load saved jobs.</p>";
+        return;
+        }
+
+const mockJobs = await response.json();
+            return mockJobs;
+        }
+
+        async function fetchJobsByCountryApi(country) {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            return allJobsData.filter(job => job.location_country === country);
+        }
+
+        /**
+         * Copies text from a specified HTML element to the clipboard.
+         * @param {string} elementId - The ID of the element to copy from.
+         * @param {HTMLElement} buttonElement - The button element that was clicked.
+         */
+        function copyToClipboard(elementId, buttonElement) {
+            const element = document.getElementById(elementId);
+            const textToCopy = element.innerText || element.value;
+
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const originalText = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+            buttonElement.classList.remove('bg-indigo-600');
+            buttonElement.classList.add('bg-green-600');
+
+            setTimeout(() => {
+                buttonElement.innerHTML = originalText;
+                buttonElement.classList.remove('bg-green-600');
+                buttonElement.classList.add('bg-indigo-600');
+            }, 2000);
+        }
+
+        /**
+         * Toggles the visibility of an accordion panel.
+         * @param {string} elementId - The ID of the panel to toggle.
+         */
+        function toggleAccordion(elementId) {
+            const panel = document.getElementById(elementId);
+            panel.classList.toggle('hidden');
+        }
+
+        /**
+         * Simulates marking a job as applied.
+         * In a real app, this would update the backend.
+         * @param {string} jobId - The ID of the job to mark as applied.
+         */
+        async function markAsApplied(jobId) {
+            // Simulate a POST request
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            showMessage("Job marked as applied! ✅");
+            // Find and update the job in mockJobs
+            const jobIndex = allJobsData.findIndex(job => job.job_id === jobId);
+            if (jobIndex !== -1) {
+                allJobsData[jobIndex].is_applied = true;
+            }
+            renderDashboard(currentCountryFilter, currentSearchQuery);
+        }
+
+        /**
+         * Displays a custom toast-like message.
+         * @param {string} message - The message to display.
+         */
+        function showMessage(message) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.innerHTML = `
+                <div class="p-4 rounded-xl shadow-lg font-semibold text-white bg-green-500">
+                    <i class="fas fa-check-circle mr-2"></i> ${message}
+                </div>
+            `;
+            messageBox.classList.remove('opacity-0', 'pointer-events-none');
+            messageBox.classList.add('opacity-100');
+
+            setTimeout(() => {
+                messageBox.classList.remove('opacity-100');
+                messageBox.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        /**
+         * Renders the jobs dashboard with applied filters.
+         * @param {string} countryFilter - The country to filter by, or 'All'.
+         * @param {string} searchQuery - The search query string.
+         * @param {Array} jobsToRender - Optional array of jobs to render. If not provided, fetches all jobs.
+         */
+        async function renderDashboard(countryFilter = 'All', searchQuery = '', jobsToRender = null) {
+            const container = document.getElementById("jobAccordion");
+            container.innerHTML = "<div class='p-6 text-center text-gray-500'>Loading saved jobs...</div>";
+            
+            let jobs = jobsToRender;
+            if (!jobs) {
+                 if (countryFilter === 'All') {
+                    jobs = await fetchJobsApi();
+                } else {
+                    jobs = await fetchJobsByCountryApi(countryFilter);
+                }
+            }
+            
+            const filteredJobs = jobs.filter(job => {
+                const matchesSearch = searchQuery === '' || 
+                                      job.Job_Title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      job.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      job.location.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesSearch;
+            });
+
+            if (!filteredJobs.length) {
+                container.innerHTML = "<p class='p-6 text-center text-gray-500'>No saved jobs match the current filters.</p>";
+                return;
+            }
+
+            container.innerHTML = "";
+            filteredJobs.forEach((job, index) => {
+                const isApplied = job.is_applied;
+                const jobId = `job-${index}`;
+                
+                // Determine status badge classes
+                const statusBadgeClasses = isApplied 
+                    ? "bg-green-500 text-white" 
+                    : "bg-yellow-400 text-gray-800";
+                const statusBadgeText = isApplied ? "Applied" : "Pending";
+
+                // Determine fit score card classes
+                const score = parseInt(job.fit_score);
+                let cardClasses = '';
+                if (score >= 80) {
+                    cardClasses = 'from-green-500 to-emerald-600';
+                } else if (score >= 50) {
+                    cardClasses = 'from-yellow-500 to-orange-500';
+                } else {
+                    cardClasses = 'from-red-500 to-rose-600';
+                }
+
+                const card = document.createElement("div");
+                card.className = "rounded-xl shadow-lg border border-gray-200 overflow-hidden";
+                
+                const recruiterLinks = (job.recruiter_linkedin_urls && job.recruiter_linkedin_urls.length > 0) 
+                    ? job.recruiter_linkedin_urls.map(link => `
+                        <li>
+                            <a href="${link}" target="_blank" class="text-indigo-600 hover:underline">
+                                ${link}
+                            </a>
+                        </li>
+                    `).join('')
+                    : `<li class="text-gray-500">No recruiters found.</li>`;
+
+                card.innerHTML = `
+                    <div class="accordion-header bg-gray-50 flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                         onclick="toggleAccordion('collapse-${jobId}')">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3">
+                                <h2 class="text-lg font-semibold text-gray-800">${job.Job_Title} @ ${job.company_name}</h2>
+                                <span class="text-xs font-bold px-2 py-1 rounded-full ${statusBadgeClasses}">${statusBadgeText}</span>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">${job.location}, ${job.location_country}</div>
+                        </div>
+                        <div class="w-20 h-10 rounded-full flex items-center justify-center font-bold text-white text-xl bg-gradient-to-br ${cardClasses} shadow-md">
+                            ${job.fit_score || 'N/A'}
+                        </div>
+                    </div>
+                    <div id="collapse-${jobId}" class="p-6 transition-all duration-300 hidden">
+                        <div class="space-y-6 text-gray-700">
+
+                            <!-- Job Details -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <h3 class="font-bold text-lg text-indigo-600 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-info-circle"></i> Job Details
+                                </h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                                    <p><strong>Date Saved:</strong> ${job["Date Saved"]}</p>
+                                    <p><strong>Fit Score:</strong> <span class="font-semibold">${job.fit_score || 'N/A'}</span></p>
+                                    <p class="sm:col-span-2"><strong>Matched Skills:</strong> ${job.fit_matched_skills}</p>
+                                    <p class="sm:col-span-2"><strong>Missing Skills:</strong> ${job.fit_missing_skills}</p>
+                                    <p class="sm:col-span-2"><strong>Summary:</strong> ${job.fit_summary}</p>
+                                    <p class="sm:col-span-2"><strong>Job URL:</strong> <a href="${job.job_url}" target="_blank" class="text-indigo-600 hover:underline">Open Job Posting</a></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Communication Templates -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <h3 class="font-bold text-lg text-indigo-600 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-paper-plane"></i> Communication Templates
+                                </h3>
+                                
+                                <div class="space-y-4">
+                                    <!-- Cold Email -->
+                                    <div>
+                                        <p class="font-semibold text-gray-900 mb-1">Cold Email Subject: <span id="coldEmailSubject-${jobId}">${job.email_cold_subject}</span></p>
+                                        <div class="relative">
+                                            <pre id="coldEmailBody-${jobId}" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${job.email_cold_body || 'N/A'}</pre>
+                                            <button onclick="copyToClipboard('coldEmailBody-${jobId}', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cover Letter -->
+                                    <div>
+                                        <p class="font-semibold text-gray-900 mb-1">Cover Letter Body:</p>
+                                        <div class="relative">
+                                            <pre id="coverLetterBody-${jobId}" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${job.cover_letter_body || 'N/A'}</pre>
+                                            <button onclick="copyToClipboard('coverLetterBody-${jobId}', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- LinkedIn Messages -->
+                                    <div>
+                                        <p class="font-semibold text-gray-900 mb-1">LinkedIn Recruiter Message:</p>
+                                        <div class="relative">
+                                            <pre id="linkedinRecruiterMessageBody-${jobId}" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${job.linkedin_message_recruiter || 'N/A'}</pre>
+                                            <button onclick="copyToClipboard('linkedinRecruiterMessageBody-${jobId}', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 mb-1">LinkedIn Referrer Message:</p>
+                                        <div class="relative">
+                                            <pre id="linkedinReferrerMessageBody-${jobId}" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${job.linkedin_message_referrer || 'N/A'}</pre>
+                                            <button onclick="copyToClipboard('linkedinReferrerMessageBody-${jobId}', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Company Insights -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <h3 class="font-bold text-lg text-indigo-600 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-building"></i> Company Insights
+                                </h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                                    <p><strong>Company Size:</strong> ${job.org_company_size || 'N/A'}</p>
+                                    <p><strong>Avg. Salary (SE):</strong> ${job.org_avg_salary_se || 'N/A'}</p>
+                                    <p class="sm:col-span-2"><strong>Recent Layoffs:</strong> ${job.org_recent_layoffs || 'N/A'}</p>
+                                    <p class="sm:col-span-2"><strong>Recruiter LinkedIn URLs:</strong></p>
+                                    <ul class="list-disc pl-5 sm:col-span-2 space-y-1">
+                                        ${recruiterLinks}
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- Mark as Applied Button -->
+                            ${!isApplied ? `<button class="w-full mt-6 px-4 py-3 font-bold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors shadow-md" onclick="markAsApplied('${job.job_id}')">
+                                <i class="fas fa-check-circle mr-2"></i> Mark as Applied
+                            </button>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        /**
+         * Renders the country tabs based on the API data.
+         */
+        async function renderCountryTabs() {
+            const tabsContainer = document.getElementById('country-tabs');
+            tabsContainer.innerHTML = "<div class='p-2 text-center text-gray-500'>Loading countries...</div>";
+            
+            const countries = await fetchCountriesApi();
+            const allCountries = ['All', ...countries];
+
+            tabsContainer.innerHTML = allCountries.map(country => `
+                <button onclick="setCountryFilter('${country}')"
+                        id="tab-${country.replace(/\s/g, '-')}"
+                        class="px-4 py-2 rounded-full font-semibold transition-colors
+                        ${country === currentCountryFilter ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">
+                    ${country}
+                </button>
+            `).join('');
+        }
+
+        /**
+         * Sets the active country filter and re-renders the dashboard.
+         * This function now triggers a new API call to fetch jobs for the selected country.
+         * @param {string} country - The country to filter by.
+         */
+        async function setCountryFilter(country) {
+            currentCountryFilter = country;
+            renderCountryTabs(); // Update the active tab styling
+
+            const container = document.getElementById("jobAccordion");
+            container.innerHTML = "<div class='p-6 text-center text-gray-500'>Loading jobs for " + country + "...</div>";
+
+            const jobs = country === 'All' ? await fetchJobsApi() : await fetchJobsByCountryApi(country);
+            renderDashboard(currentCountryFilter, currentSearchQuery, jobs);
+        }
+
+        // Event listener for the search bar
+        document.getElementById('search-bar').addEventListener('input', (event) => {
+            currentSearchQuery = event.target.value;
+            // Get the jobs currently displayed and filter them locally
+            const jobsInView = allJobsData.filter(job => currentCountryFilter === 'All' || job.location_country === currentCountryFilter);
+            renderDashboard(currentCountryFilter, currentSearchQuery, jobsInView);
+        });
+
+        // Initial render on page load
+        (async () => {
+            await renderCountryTabs();
+            await renderDashboard();
+        })();
+    </script>
+</body>
+</html>

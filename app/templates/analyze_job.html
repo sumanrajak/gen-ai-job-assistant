@@ -1,0 +1,98 @@
+<!-- app/templates/analyze_job.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Analyzer</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        h2 { border-bottom: 1px solid #ccc; padding-bottom: 0.25rem; }
+        .section { margin-bottom: 2rem; }
+        textarea { width: 100%; height: 200px; }
+        pre { background: #f4f4f4; padding: 1rem; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Job Auto Apply Assistant</h1>
+
+   <form method="post" action="/analyze-job">
+    <label for="job_description">Paste Job Description:</label><br>
+    <textarea name="job_description" rows="15" cols="100">{{ job_description or '' }}</textarea><br><br>
+    <button type="submit">Analyze</button>
+</form>
+
+    {% if results %}
+        {% if results.errors %}
+            <div class="section">
+                <h2>❌ Errors</h2>
+                <ul>
+                    {% for err in results.errors %}
+                        <li>{{ err }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if results.job_info %}
+        <div class="section">
+            <h2>💼 Job Information</h2>
+            <ul>
+                {% for key, value in results.job_info.dict().items() %}
+                    <li><strong>{{ key.replace('_', ' ') }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if results.fit_eval %}
+        <div class="section">
+            <h2>🎯 Fit Evaluation</h2>
+            <p><strong>Fit Score:</strong> {{ results.fit_eval.fit_score }}/10</p>
+            <p><strong>Matched Skills:</strong> {{ results.fit_eval.matched_skills | join(', ') }}</p>
+            <p><strong>Missing Skills:</strong> {{ results.fit_eval.missing_skills | join(', ') }}</p>
+            <p><strong>Summary:</strong> {{ results.fit_eval.summary }}</p>
+        </div>
+        {% endif %}
+
+        {% if results.email_cover %}
+        <div class="section">
+            <h2>✉️ Email & Cover Letter</h2>
+            <h3>Cold Email</h3>
+            <p><strong>Subject:</strong> {{ results.email_cover.cold_email.subject }}</p>
+            <pre>{{ results.email_cover.cold_email.body }}</pre>
+
+            <h3>Cover Letter</h3>
+            <pre>{{ results.email_cover.cover_letter.body }}</pre>
+
+            <h3>LinkedIn Message (Recruiter)</h3>
+            <pre>{{ results.email_cover.linkdin_networking_message_recruiter.body }}</pre>
+
+            <h3>LinkedIn Message (Referrer)</h3>
+            <pre>{{ results.email_cover.linkdin_networking_message_referrer.body }}</pre>
+        </div>
+        {% endif %}
+
+        {% if results.org_eval %}
+        <div class="section">
+            <h2>🏢 Organization Research</h2>
+            <ul>
+                {% for key, value in results.org_eval.company_research_report.dict().items() %}
+                    <li><strong>{{ key.replace('_', ' ') }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if results.recruiters %}
+        <div class="section">
+            <h2>👤 Recruiters</h2>
+            <ul>
+                {% for link in results.recruiters %}
+                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+    {% endif %}
+</body>
+</html>

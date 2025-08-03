@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Job Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
+
+    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full h-full border border-gray-200">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center flex items-center justify-center">
+                <span class="text-indigo-600 mr-3">
+                    <i class="fas fa-robot"></i>
+                </span>
+                GenAI Job Assistant
+            </h1>
+        </div>
+
+        <!-- Input Section -->
+        <div class="mb-8">
+            <label for="jd" class="block text-lg font-semibold text-gray-700 mb-2">
+                Paste Job Description:
+            </label>
+            <textarea id="jd" class="w-full h-48 p-4 text-base text-gray-700 bg-gray-50 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-y" placeholder="Paste the job description here..."></textarea>
+            <button onclick="analyzeJob()" class="w-full mt-4 py-3 px-6 text-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 rounded-xl transition-all shadow-md hover:shadow-lg">
+                Analyze
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden">
+            <!-- Content will be dynamically injected here -->
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Copies text from a specified HTML element to the clipboard.
+         * @param {string} elementId - The ID of the element to copy from.
+         */
+        function copyToClipboard(elementId, buttonElement) {
+            const element = document.getElementById(elementId);
+            const textToCopy = element.innerText || element.value;
+
+            // Use a temporary textarea to hold the text for the copy command
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            // Provide user feedback on the button itself
+            const originalText = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+            buttonElement.classList.remove('bg-indigo-600');
+            buttonElement.classList.add('bg-green-600');
+
+            setTimeout(() => {
+                buttonElement.innerHTML = originalText;
+                buttonElement.classList.remove('bg-green-600');
+                buttonElement.classList.add('bg-indigo-600');
+            }, 2000);
+        }
+
+        /**
+         * Simulates an API call to analyze a job description.
+         * In a real application, this would be a fetch to a backend service.
+         */
+        async function fetchMockAnalysis(jobDescription) {
+            // Simulate a network delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Mock data for demonstration purposes
+            if (jobDescription.length < 5) {
+                return {
+                    errors: ["Please provide a more detailed job description to get a useful analysis."]
+                };
+            }
+            
+            // Randomly generate a fit score for dynamic coloring demonstration
+            const randomFitScore = Math.floor(Math.random() * 100);
+
+            return {
+                job_info: {
+                    "Title": "Senior Software Engineer",
+                    "Company": "Innovate Corp",
+                    "Location": "Remote, San Francisco",
+                    "Experience Level": "5+ years",
+                    "Key Responsibilities": "Design, develop, and deploy scalable microservices. Mentor junior engineers.",
+                    "Skills Required": "Python, AWS, Docker, Kubernetes"
+                },
+                fit_eval: {
+                    "fit_score": `${randomFitScore}%`,
+                    "matched_skills": ["Python", "AWS", "Docker"],
+                    "missing_skills": ["Go", "Terraform"],
+                    "summary": "You have a strong background in backend development and cloud technologies, which aligns well with the core requirements. Focus on showcasing your experience with microservices and your leadership skills in your application materials."
+                },
+                email_cover: {
+                    "cold email": {
+                        "subject": "Application for Senior Software Engineer - [Your Name]",
+                        "body": "Dear [Hiring Manager Name],\n\nI am writing to express my enthusiastic interest in the Senior Software Engineer position at Innovate Corp, which I found on LinkedIn. With over 7 years of experience developing and deploying scalable systems using Python, AWS, and Docker, my skills are a strong match for your team's needs. I have a proven track record of leading projects and mentoring junior developers, and I am excited by the opportunity to contribute to Innovate Corp's innovative work in the finance sector.\n\nThank you for your consideration. I have attached my resume and look forward to hearing from you.\n\nBest regards,\n[Your Name]"
+                    },
+                    "cover letter": {
+                        "body": "Dear [Hiring Manager Name],\n\nI am writing to apply for the Senior Software Engineer role at Innovate Corp. My extensive background in building high-performance backend systems, coupled with expertise in Python, cloud technologies like AWS, and containerization with Docker and Kubernetes, makes me an ideal candidate for this position. At my previous company, I spearheaded a project to migrate our monolithic application to a microservices architecture, which resulted in a 30% increase in performance and improved system reliability. I am confident that my skills and experience would enable me to make a significant contribution to your team from day one. I am particularly drawn to Innovate Corp's mission to leverage technology to create a better financial future.\n\nThank you for your time and consideration. I have attached my resume and can be reached at your earliest convenience to discuss how I can help Innovate Corp achieve its goals.\n\nSincerely,\n[Your Name]"
+                    },
+                    "linkedin_networking_message_recruiter": {
+                        "body": "Hi [Recruiter Name], I came across the Senior Software Engineer position at Innovate Corp on LinkedIn and was very impressed with the company's work. With my background in Python and AWS, I believe I could be a great fit for the role. I'd love to connect and learn more about the team. Thanks, [Your Name]."
+                    },
+                    "linkedin_networking_message_hiring_manager": {
+                        "body": "Hello [Hiring Manager Name], I'm a Senior Software Engineer with a strong background in scalable systems and cloud architecture. I was excited to see the opening on your team at Innovate Corp and believe my experience in microservices and mentorship would be a valuable asset. I've attached my resume and would be grateful for the opportunity to discuss my qualifications further. Best, [Your Name]."
+                    }
+                },
+                recruiters: [
+                    "https://www.linkedin.com/in/recruiter-at-innovate-corp",
+                    "https://www.linkedin.com/in/hiring-manager-innovate"
+                ],
+                org_eval: {
+                    company_research_report: {
+                        "Company Mission": "Innovate Corp's mission is to build innovative and scalable solutions for the finance sector.",
+                        "Recent News": "Recently announced a Series C funding round of $50M to expand their AI platform.",
+                        "Company Culture": "Known for a fast-paced, collaborative culture with a strong emphasis on engineering excellence.",
+                        "Key Technologies": "Python, Go, AWS, Docker, Kubernetes, Terraform."
+                    }
+                }
+            };
+        }
+
+        async function analyzeJob() {
+            const jd = document.getElementById('jd').value;
+            const resDiv = document.getElementById('results');
+            resDiv.classList.remove('hidden');
+            resDiv.innerHTML = `
+                <div class="flex items-center justify-center p-6 text-indigo-600 bg-indigo-50 rounded-xl">
+                    <i class="fas fa-sync-alt fa-spin mr-3 text-2xl"></i>
+                    <span class="text-xl font-medium">Processing... Please wait.</span>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/analyze-job', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ job_description: jd })
+                        });
+
+                        const data = await response.json(); // <- THIS IS REQUIRED
+                        console.log(data);
+
+                if (data.errors && data.errors.length > 0) {
+                    resDiv.innerHTML = `
+                        <div class="p-6 bg-red-100 rounded-xl border border-red-200 text-red-700">
+                            <h3 class="font-bold text-xl mb-2 flex items-center">
+                                <i class="fas fa-exclamation-triangle mr-2"></i> Error
+                            </h3>
+                            <ul class="list-disc pl-5">
+                                ${data.errors.map(e => `<li>${e}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `<div class="grid md:grid-cols-2 gap-6">`;
+
+                // Fit Evaluation Card (prominent)
+                if (data.fit_eval) {
+                    const score = parseInt(data.fit_eval.fit_score);
+                    let cardClasses = '';
+                    if (score >= 8) {
+                        cardClasses = 'bg-gradient-to-br from-green-500 to-emerald-600';
+                    } else if (score >= 5) {
+                        cardClasses = 'bg-gradient-to-br from-yellow-500 to-orange-500';
+                    } else {
+                        cardClasses = 'bg-gradient-to-br from-red-500 to-rose-600';
+                    }
+
+                    html += `
+                        <div class="md:col-span-2 ${cardClasses} text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+                            <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
+                                <i class="fas fa-bullseye"></i>
+                                Fit Evaluation
+                            </h3>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-5xl font-extrabold">${data.fit_eval.fit_score}</p>
+                                    <p class="text-lg font-medium text-white/80">Confidence Score</p>
+                                </div>
+                                <div class="text-right text-white/90">
+                                    <p>Matched: <span class="font-semibold">${data.fit_eval.matched_skills.join(", ")}</span></p>
+                                    <p>Missing: <span class="font-semibold">${data.fit_eval.missing_skills.join(", ")}</span></p>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-white/90">${data.fit_eval.summary}</p>
+                        </div>
+                    `;
+                }
+
+                // Job Info Card
+                if (data.job_info) {
+                    html += `
+                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-briefcase text-indigo-500"></i>
+                                Job Info
+                            </h3>
+                            <ul class="space-y-3 text-gray-700">
+                                ${Object.entries(data.job_info).map(([key, val]) => `
+                                    <li class="flex flex-col">
+                                        <strong class="text-indigo-600">${key}:</strong>
+                                        <span>${val}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                // Company Research Card
+                if (data.org_eval && data.org_eval.company_research_report) {
+                    const report = data.org_eval.company_research_report;
+                    html += `
+                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-building text-indigo-500"></i>
+                                Company Research
+                            </h3>
+                            <ul class="space-y-3 text-gray-700">
+                                ${Object.entries(report).map(([key, val]) => `
+                                    <li class="flex flex-col">
+                                        <strong class="text-indigo-600">${key}:</strong>
+                                        <span>${val}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                // Recruiters Card
+                if (data.recruiters && data.recruiters.length > 0) {
+                    html += `
+                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fab fa-linkedin text-indigo-500"></i>
+                                Recruiters
+                            </h3>
+                            <ul class="space-y-2">
+                                ${data.recruiters.map(link => `
+                                    <li>
+                                        <a href="${link}" target="_blank" class="text-indigo-600 hover:underline">
+                                            ${link}
+                                        </a>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`; // Close grid
+
+                // Email and Cover Letter Section
+                if (data.email_cover) {
+                    html += `
+                        <div class="mt-6 md:mt-8 space-y-8">
+                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-envelope text-indigo-500"></i>
+                                    Cold Email
+                                </h3>
+                                <div class="flex items-center justify-between mb-2">
+                                    <p class="font-semibold text-gray-900">Subject: <span id="coldEmailSubject">${data.email_cover["cold email"].subject}</span></p>
+                                    <button onclick="copyToClipboard('coldEmailSubject', this)" class="bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="relative">
+                                    <pre id="coldEmailBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["cold email"].body}</pre>
+                                    <button onclick="copyToClipboard('coldEmailBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-file-alt text-indigo-500"></i>
+                                    Cover Letter
+                                </h3>
+                                <div class="relative">
+                                    <pre id="coverLetterBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["cover letter"].body}</pre>
+                                    <button onclick="copyToClipboard('coverLetterBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <i class="fab fa-linkedin text-indigo-500"></i>
+                                    LinkedIn Networking Message to Recruiter
+                                </h3>
+                                <div class="relative">
+                                    <pre id="linkedinRecruiterMessageBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["linkdin_networking_message_referrer"].body}</pre>
+                                    <button onclick="copyToClipboard('linkedinRecruiterMessageBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <i class="fab fa-linkedin text-indigo-500"></i>
+                                    LinkedIn Networking Message to Hiring Manager
+                                </h3>
+                                <div class="relative">
+                                    <pre id="linkedinHiringManagerMessageBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["linkdin_networking_message_recruiter"].body}</pre>
+                                    <button onclick="copyToClipboard('linkedinHiringManagerMessageBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                resDiv.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+                resDiv.innerHTML = `
+                    <div class="p-6 bg-red-100 rounded-xl border border-red-200 text-red-700">
+                        <h3 class="font-bold text-xl mb-2 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> An unexpected error occurred.
+                        </h3>
+                        <p>Please check your network connection and try again.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+
+</body>
+</html>
