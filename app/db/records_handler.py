@@ -54,3 +54,18 @@ def mark_as_applied(job_id: str):
     df.loc[df["job_id"] == job_id, "is_applied"] = True
     df.to_excel(EXCEL_DB_PATH, index=False)
     return True
+
+def list_sheet_names():
+    if not os.path.exists(EXCEL_DB_PATH):
+        return []
+    with pd.ExcelFile(EXCEL_DB_PATH) as xls:
+        return xls.sheet_names
+
+def load_sheet_data(sheet_name: str):
+    if not os.path.exists(EXCEL_DB_PATH):
+        return []
+    with pd.ExcelFile(EXCEL_DB_PATH) as xls:
+        if sheet_name not in xls.sheet_names:
+            return []
+        df = pd.read_excel(xls, sheet_name=sheet_name)
+        return df.fillna("").to_dict(orient="records")

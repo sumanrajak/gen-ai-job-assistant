@@ -4,7 +4,9 @@ from typing import List, Optional
 from app.db.records_handler import (
     save_application_record,
     load_application_records,
-    mark_as_applied
+    mark_as_applied,
+    list_sheet_names,
+    load_sheet_data
 )
 
 router = APIRouter(prefix="/api")
@@ -56,3 +58,18 @@ def mark_job_applied(req: ApplyJobRequest):
     """
     success = mark_as_applied(req.job_id)
     return {"status": "ok" if success else "error"}
+
+@router.get("/sheet-names")
+def get_sheet_names():
+    """
+    Get the names of all sheets in the Excel database.
+    """
+    return {"sheet_names": list_sheet_names()}
+
+@router.get("/sheet-data/{sheet_name}")
+def get_sheet_data(sheet_name: str):
+    """
+    Load data from a specific sheet in the Excel database.
+    """
+    data = load_sheet_data(sheet_name)
+    return {"data": data if data else []}

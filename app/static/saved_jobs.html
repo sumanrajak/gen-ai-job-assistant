@@ -172,14 +172,17 @@
         // Mock API functions
         async function fetchCountriesApi() {
             // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 300));
-            return [...new Set(allJobsData.map(job => job.location_country))];
+            let countries= await fetch("/api/sheet-names");
+            let countriesData = await countries.json();
+            
+            return countriesData.sheet_names;
         }
 
         async function fetchJobsApi() {
             // Simulate API call delay
             await new Promise(resolve => setTimeout(resolve, 500));
             const response = await fetch("/api/saved-jobs");
+            
 
         if (!response.ok) {
         document.getElementById("jobAccordion").innerHTML = "<p class='p-6 text-center text-red-500'>❌ Failed to load saved jobs.</p>";
@@ -191,9 +194,15 @@ const mockJobs = await response.json();
         }
 
         async function fetchJobsByCountryApi(country) {
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 500));
-            return allJobsData.filter(job => job.location_country === country);
+            let  sheet_data = await fetch("/api/sheet-data/"+encodeURIComponent(country));
+            if (!sheet_data.ok) {
+                document.getElementById("jobAccordion").innerHTML = "<p class='p-6 text-center text-red-500'>❌ Failed to load jobs for " + country + ".</p>";
+                return [];
+            }
+            let jobs = await sheet_data.json();
+            console.log("Jobs for country:", country, jobs);
+            
+            return jobs.data ;
         }
 
         /**
@@ -317,9 +326,9 @@ const mockJobs = await response.json();
                 // Determine fit score card classes
                 const score = parseInt(job.fit_score);
                 let cardClasses = '';
-                if (score >= 80) {
+                if (score >= 8) {
                     cardClasses = 'from-green-500 to-emerald-600';
-                } else if (score >= 50) {
+                } else if (score >= 5) {
                     cardClasses = 'from-yellow-500 to-orange-500';
                 } else {
                     cardClasses = 'from-red-500 to-rose-600';
@@ -329,7 +338,7 @@ const mockJobs = await response.json();
                 card.className = "rounded-xl shadow-lg border border-gray-200 overflow-hidden";
                 
                 const recruiterLinks = (job.recruiter_linkedin_urls && job.recruiter_linkedin_urls.length > 0) 
-                    ? job.recruiter_linkedin_urls.map(link => `
+                    ? JSON.parse(job.recruiter_linkedin_urls).map(link => `
                         <li>
                             <a href="${link}" target="_blank" class="text-indigo-600 hover:underline">
                                 ${link}
@@ -457,7 +466,7 @@ const mockJobs = await response.json();
             tabsContainer.innerHTML = "<div class='p-2 text-center text-gray-500'>Loading countries...</div>";
             
             const countries = await fetchCountriesApi();
-            const allCountries = ['All', ...countries];
+            const allCountries = [ ...countries];
 
             tabsContainer.innerHTML = allCountries.map(country => `
                 <button onclick="setCountryFilter('${country}')"
