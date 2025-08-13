@@ -1,0 +1,564 @@
+{
+  "Canada": {
+    "country_name": "Canada",
+    "job_portals": [
+      "https://www.jobbank.gc.ca/findajob",
+      "https://ca.indeed.com",
+      "https://www.linkedin.com/jobs/canada-jobs",
+      "https://www.glassdoor.ca/Job/canada-full-stack-developer-jobs-SRCH_IL.0,6_IN3_KO7,27.htm",
+      "https://www.workopolis.com",
+      "https://angel.co/ (startup roles)",
+      "https://www.monster.ca"
+    ],
+    "expected_salary_as_per_current_salary_local": "CAD 90,000 - 150,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹5,727,600 - ₹9,546,000",
+    "hiring_agencies_links": [
+      "https://www.robert-walters.ca/",
+      "https://www.randstad.ca/",
+      "https://www.michaelpage.ca/",
+      "https://www.hays.ca/",
+      "https://www.roberthalf.ca/"
+    ],
+    "cities_to_target": [
+      "Toronto",
+      "Vancouver",
+      "Montreal",
+      "Ottawa",
+      "Waterloo/Kitchener"
+    ],
+    "avg_salaries_full_stack_local_currency": "CAD 64,353 - 99,176 (typical range), average ~CAD 79,420/year (Glassdoor).",
+    "avg_salaries_full_stack_in_inr": "₹4,096,000 - ₹6,310,000 (range) ; avg ≈ ₹5,051,000/year.",
+    "sources": [
+      ":contentReference[oaicite:0]{index=0}",
+      ":contentReference[oaicite:1]{index=1}",
+      ":contentReference[oaicite:2]{index=2}"
+    ]
+  },
+
+  "United Kingdom": {
+    "country_name": "United Kingdom",
+    "job_portals": [
+      "https://app.withpoli.com/jobs",
+      "https://www.findajob.dwp.gov.uk",
+      "https://www.gov.uk/find-a-job",
+      "https://www.indeed.co.uk",
+      "https://www.linkedin.com/jobs/",
+      "https://www.reed.co.uk",
+      "https://www.cwjobs.co.uk",
+      "https://www.ukvisajobs.com (visa-sponsorship focused aggregator)"
+    ],
+    "expected_salary_as_per_current_salary_local": "GBP 60,000 - 110,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹6,751,800 - ₹12,378,300",
+    "hiring_agencies_links": [
+      "https://www.hays.co.uk/",
+      "https://www.michaelpage.co.uk/",
+      "https://www.robertwalters.co.uk/",
+      "https://www.randstad.co.uk/",
+      "https://www.roberthalf.co.uk/"
+    ],
+    "cities_to_target": [
+      "London",
+      "Cambridge",
+      "Manchester",
+      "Edinburgh",
+      "Bristol"
+    ],
+    "avg_salaries_full_stack_local_currency": "£41,536 - £69,580 (typical range in London) ; Glassdoor shows average ~£53,475/year for London.",
+    "avg_salaries_full_stack_in_inr": "₹4,673,000 - ₹7,828,000 (range) ; avg ≈ ₹6,016,000/year.",
+    "sources": [
+      ":contentReference[oaicite:3]{index=3}",
+      ":contentReference[oaicite:4]{index=4}",
+      ":contentReference[oaicite:5]{index=5}"
+    ]
+  },
+
+  "Germany": {
+    "country_name": "Germany",
+    "job_portals": [
+      "https://www.make-it-in-germany.com/en/working-in-germany/job-listings",
+      "https://www.stepstone.de",
+      "https://de.indeed.com",
+      "https://www.linkedin.com/jobs/",
+      "https://www.xing.com/jobs",
+      "https://www.arbeitnow.com/visa-sponsorship-jobs"
+    ],
+    "expected_salary_as_per_current_salary_local": "EUR 60,000 - 100,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹6,123,600 - ₹10,206,000",
+    "hiring_agencies_links": [
+      "https://www.michaelpage.de/",
+      "https://www.hays.de/",
+      "https://www.robertwalters.de/",
+      "https://www.randstad.de/",
+      "https://www.adecco.de/"
+    ],
+    "cities_to_target": [
+      "Berlin",
+      "Munich",
+      "Hamburg",
+      "Frankfurt",
+      "Stuttgart"
+    ],
+    "avg_salaries_full_stack_local_currency": "≈ EUR 62,150 - 86,500 (senior range); Glassdoor average ~EUR 63,500/year for Full Stack roles.",
+    "avg_salaries_full_stack_in_inr": "₹6,340,000 - ₹8,830,000 (range) ; avg ≈ ₹6,486,000/year.",
+    "sources": [
+      ":contentReference[oaicite:6]{index=6}",
+      ":contentReference[oaicite:7]{index=7}",
+      ":contentReference[oaicite:8]{index=8}"
+    ]
+  },
+
+  "Australia": {
+    "country_name": "Australia",
+    "job_portals": [
+      "https://www.seek.com.au",
+      "https://au.indeed.com",
+      "https://www.linkedin.com/jobs",
+      "https://www.jora.com.au",
+      "https://www.careerone.com.au",
+      "https://www.jobactive.gov.au (government portal)"
+    ],
+    "expected_salary_as_per_current_salary_local": "AUD 110,000 - 160,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹6,275,500 - ₹9,128,000",
+    "hiring_agencies_links": [
+      "https://www.hays.com.au/",
+      "https://www.robertwalters.com.au/",
+      "https://www.michaelpage.com.au/",
+      "https://www.randstad.com.au/",
+      "https://www.roberthalf.com.au/"
+    ],
+    "cities_to_target": [
+      "Sydney",
+      "Melbourne",
+      "Brisbane",
+      "Perth",
+      "Adelaide"
+    ],
+    "avg_salaries_full_stack_local_currency": "PayScale / market data: average ≈ AUD 89,000/year; typical range AUD 62k - 128k.",
+    "avg_salaries_full_stack_in_inr": "₹3,540,000 - ₹7,297,000 (range) ; avg ≈ ₹5,073,000/year.",
+    "sources": [
+      ":contentReference[oaicite:9]{index=9}",
+      ":contentReference[oaicite:10]{index=10}",
+      ":contentReference[oaicite:11]{index=11}"
+    ]
+  },
+
+  "Singapore": {
+    "country_name": "Singapore",
+    "job_portals": [
+      "https://www.mycareersfuture.gov.sg",
+      "https://www.jobstreet.com.sg",
+      "https://www.jobsdb.com/sg",
+      "https://www.linkedin.com/jobs",
+      "https://www.glassdoor.sg",
+      "https://www.jobscentral.com.sg"
+    ],
+    "expected_salary_as_per_current_salary_local": "SGD 90,000 - 170,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹6,129,900 - ₹11,578,700",
+    "hiring_agencies_links": [
+      "https://www.hays.com.sg/",
+      "https://www.michaelpage.com.sg/",
+      "https://www.randstad.com.sg/",
+      "https://www.robertwalters.com.sg/",
+      "https://www.kovalam.com/ (regional tech recruiters)"
+    ],
+    "cities_to_target": [
+      "Singapore (central business district and tech parks)"
+    ],
+    "avg_salaries_full_stack_local_currency": "Glassdoor data shows a varied range; experienced/full-stack engineers often average in the SGD 60k–120k band depending on seniority and company.",
+    "avg_salaries_full_stack_in_inr": "Approx avg band ≈ ₹4,086,000 - ₹8,173,000/year (SGD 60k–120k equivalent).",
+    "sources": [
+      ":contentReference[oaicite:12]{index=12}",
+      ":contentReference[oaicite:13]{index=13}",
+      ":contentReference[oaicite:14]{index=14}"
+    ]
+  },
+
+  "United Arab Emirates": {
+    "country_name": "United Arab Emirates",
+    "job_portals": [
+      "https://www.linkedin.com/jobs/",
+      "https://www.gulftalent.com",
+      "https://www.bayt.com",
+      "https://www.naukrigulf.com",
+      "https://www.dubizzle.com/jobs",
+      "https://www.careers.gov.ae (government listings)"
+    ],
+    "expected_salary_as_per_current_salary_local": "AED 210,000 - 420,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹4,926,600 - ₹9,853,200",
+    "hiring_agencies_links": [
+      "https://www.propelconsult.com/",
+      "https://www.charterhouseme.com/",
+      "https://www.robertwalters.ae/",
+      "https://www.michaelpage.ae/",
+      "https://www.hays.ae/"
+    ],
+    "cities_to_target": [
+      "Dubai",
+      "Abu Dhabi",
+      "Sharjah"
+    ],
+    "avg_salaries_full_stack_local_currency": "Market ranges vary; senior full-stack engineers typically fall between AED 150k–360k depending on firm (local Glassdoor snapshots vary due to limited samples).",
+    "avg_salaries_full_stack_in_inr": "Approx range ≈ ₹3,519,000 - ₹8,445,000/year; averages are volatile by company and benefits (housing/allowances) matter.",
+    "sources": [
+      ":contentReference[oaicite:15]{index=15}",
+      ":contentReference[oaicite:16]{index=16}",
+      ":contentReference[oaicite:17]{index=17}"
+    ]
+  },
+
+  "Netherlands": {
+    "country_name": "Netherlands",
+    "job_portals": [
+      "https://www.indeed.nl",
+      "https://www.nationalevacaturebank.nl",
+      "https://www.linkedin.com/jobs",
+      "https://www.iamsterdam.com/en/work/working-in-amsterdam/jobs",
+      "https://www.glassdoor.nl"
+    ],
+    "expected_salary_as_per_current_salary_local": "EUR 68,000 - 122,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹6,940,080 - ₹12,451,320",
+    "hiring_agencies_links": [
+      "https://www.randstad.nl/",
+      "https://www.michaelpage.nl/",
+      "https://www.robertwalters.nl/",
+      "https://www.hays.nl/",
+      "https://www.adecco.nl/"
+    ],
+    "cities_to_target": [
+      "Amsterdam",
+      "Eindhoven",
+      "Rotterdam",
+      "Utrecht"
+    ],
+    "avg_salaries_full_stack_local_currency": "Glassdoor reports avg ≈ €70,000/year (range €50,700 - €86,250 typical).",
+    "avg_salaries_full_stack_in_inr": "Approx range ≈ ₹5,790,000 - ₹8,790,000 (typical) ; avg ≈ ₹7,140,000/year.",
+    "sources": [
+      ":contentReference[oaicite:18]{index=18}",
+      ":contentReference[oaicite:19]{index=19}",
+      ":contentReference[oaicite:20]{index=20}"
+    ]
+  },
+
+  "Ireland": {
+    "country_name": "Ireland",
+    "job_portals": [
+      "https://www.irishjobs.ie",
+      "https://www.jobs.ie",
+      "https://www.linkedin.com/jobs",
+      "https://www.indeed.ie",
+      "https://www.gov.ie/en/publication/5b9f7-immigration-service-/"
+    ],
+    "expected_salary_as_per_current_salary_local": "EUR 60,000 - 110,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹6,123,600 - ₹11,226,600",
+    "hiring_agencies_links": [
+      "https://www.michaelpage.ie/",
+      "https://www.hays.ie/",
+      "https://www.robertwalters.ie/",
+      "https://www.cpl.com/ie",
+      "https://www.sigmarrecruitment.com/"
+    ],
+    "cities_to_target": [
+      "Dublin",
+      "Cork",
+      "Galway"
+    ],
+    "avg_salaries_full_stack_local_currency": "Glassdoor median total pay ≈ €55,000/year for Full Stack developers in Ireland (range €46K–€65K).",
+    "avg_salaries_full_stack_in_inr": "Approx avg ≈ ₹5,929,000/year (range ≈ ₹4,737,000 - ₹6,627,000).",
+    "sources": [
+      ":contentReference[oaicite:21]{index=21}",
+      ":contentReference[oaicite:22]{index=22}",
+      ":contentReference[oaicite:23]{index=23}"
+    ]
+  },
+
+  "New Zealand": {
+    "country_name": "New Zealand",
+    "job_portals": [
+      "https://www.seek.co.nz",
+      "https://www.trademe.co.nz/jobs",
+      "https://www.linkedin.com/jobs",
+      "https://www.clearancejobs.co.nz",
+      "https://www.govt.nz/browse/work/work-abroad/"
+    ],
+    "expected_salary_as_per_current_salary_local": "NZD 80,000 - 120,000",
+    "expected_salary_as_per_current_salary_in_inr": "₹4,168,800 - ₹6,253,200",
+    "hiring_agencies_links": [
+      "https://www.robertwalters.co.nz/",
+      "https://www.michaelpage.co.nz/",
+      "https://www.hays.net.nz/",
+      "https://www.randstad.co.nz/",
+      "https://www.adecco.co.nz/"
+    ],
+    "cities_to_target": [
+      "Auckland",
+      "Wellington",
+      "Christchurch"
+    ],
+    "avg_salaries_full_stack_local_currency": "Glassdoor shows average ≈ NZ$92,000 - NZ$95,600 for full stack engineers (market dependent).",
+    "avg_salaries_full_stack_in_inr": "Approx avg ≈ ₹4,800,000 - ₹4,975,000/year (NZD 92k–95.6k).",
+    "sources": [
+      ":contentReference[oaicite:24]{index=24}",
+      ":contentReference[oaicite:25]{index=25}",
+      ":contentReference[oaicite:26]{index=26}"
+    ]
+  },
+
+  
+  "Poland": {
+    "country_name": "Poland",
+    "job_portals": [
+      "https://www.pracuj.pl",
+      "https://www.no-fluff.jobs",
+      "https://www.bulldogjob.com",
+      "https://www.indeed.pl",
+      "https://www.linkedin.com/jobs",
+      "https://www.goldenline.pl"
+    ],
+    "expected_salary_as_per_current_salary_local": "PLN 180,000 - 360,000 (annual)  (target band for mid→senior Full-Stack + GenAI)",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹36 L – ₹72 L",
+    "hiring_agencies_links": [
+      "https://www.randstad.pl",
+      "https://www.hays.pl",
+      "https://www.michaelpage.pl",
+      "https://devsdata.com/top-it-recruitment-agencies-in-poland/",
+      "https://www.adecco.pl"
+    ],
+    "cities_to_target": [
+      "Warsaw",
+      "Kraków",
+      "Wrocław",
+      "Gdańsk",
+      "Poznań"
+    ],
+    "avg_salaries_full_stack_local_currency": "Mid: PLN 12,000–17,000 / month (≈ PLN 144k–204k/year); Senior: PLN 18,000–24,000 / month (≈ PLN 216k–288k/year) (Bulldogjob data).",
+    "avg_salaries_full_stack_in_inr": "≈ ₹28 L – ₹57 L (typical market mid→senior ranges).",
+    "sources": [
+      ":contentReference[oaicite:0]{index=0}",
+      ":contentReference[oaicite:1]{index=1}",
+      ":contentReference[oaicite:2]{index=2}",
+      ":contentReference[oaicite:3]{index=3}"
+    ]
+  },
+
+  "France": {
+    "country_name": "France",
+    "job_portals": [
+      "https://www.pole-emploi.fr",
+      "https://www.indeed.fr",
+      "https://www.linkedin.com/jobs",
+      "https://www.welcometothejungle.com",
+      "https://www.apec.fr"
+    ],
+    "expected_salary_as_per_current_salary_local": "EUR 50,000 - 95,000 (annual) — market target for Full-Stack with GenAI skills",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹46 L – ₹87 L",
+    "hiring_agencies_links": [
+      "https://www.michaelpage.fr",
+      "https://www.hays.fr",
+      "https://www.robertwalters.fr",
+      "https://www.randstad.fr",
+      "https://www.adecco.fr"
+    ],
+    "cities_to_target": [
+      "Paris",
+      "Lyon",
+      "Lille",
+      "Toulouse",
+      "Bordeaux"
+    ],
+    "avg_salaries_full_stack_local_currency": "Glassdoor / PayScale: average ≈ €39k–€47k/year for Full-Stack; senior roles up to ~€60k+ in Paris/top firms.",
+    "avg_salaries_full_stack_in_inr": "≈ ₹36 L – ₹61 L (typical averages; senior positions higher).",
+    "sources": [
+      ":contentReference[oaicite:4]{index=4}",
+      ":contentReference[oaicite:5]{index=5}",
+      ":contentReference[oaicite:6]{index=6}"
+    ]
+  },
+
+  "Saudi Arabia": {
+    "country_name": "Saudi Arabia",
+    "job_portals": [
+      "https://www.gulftalent.com/saudi-arabia/jobs",
+      "https://www.naukrigulf.com",
+      "https://www.bayt.com/en/saudi-arabia/",
+      "https://www.linkedin.com/jobs",
+      "https://www.mihnati.com"
+    ],
+    "expected_salary_as_per_current_salary_local": "SAR 200,000 - 400,000 (annual) — target band for senior Full-Stack / GenAI roles",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹44 L – ₹88 L",
+    "hiring_agencies_links": [
+      "https://www.gulfrecruitmentgroup.com/",
+      "https://www.robertwalters.sa/",
+      "https://www.charterhouseme.com/",
+      "https://www.randstad.com.sa/",
+      "https://www.hays.ae/ (regional)"
+    ],
+    "cities_to_target": [
+      "Riyadh",
+      "Jeddah",
+      "Dammam"
+    ],
+    "avg_salaries_full_stack_local_currency": "Market sites (Naukrigulf / GulfTalent): broad range — many mid-level full-stack roles show monthly SAR 6k–23k; senior specialized AI roles pay higher consistent with target band above.",
+    "avg_salaries_full_stack_in_inr": "Approx typical mid→senior ranges ≈ ₹22 L – ₹88 L depending on role & allowances.",
+    "sources": [
+      ":contentReference[oaicite:7]{index=7}",
+      ":contentReference[oaicite:8]{index=8}",
+      ":contentReference[oaicite:9]{index=9}"
+    ]
+  },
+
+  "Qatar": {
+    "country_name": "Qatar",
+    "job_portals": [
+      "https://www.gulftalent.com/qatar/jobs",
+      "https://www.naukrigulf.com/qatar-jobs",
+      "https://qa.indeed.com",
+      "https://www.linkedin.com/jobs",
+      "https://www.qatarliving.com/jobs (community listings)"
+    ],
+    "expected_salary_as_per_current_salary_local": "QAR 180,000 - 360,000 (annual) — target band for senior roles",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹39 L – ₹78 L",
+    "hiring_agencies_links": [
+      "https://www.gulfrecruitment.com/",
+      "https://www.charterhouseme.com/",
+      "https://www.michaelpage.ae/",
+      "https://www.robertwalters.com/"
+    ],
+    "cities_to_target": [
+      "Doha",
+      "Al Rayyan"
+    ],
+    "avg_salaries_full_stack_local_currency": "Indeed / Glassdoor show averages in the range QAR ~5.8k/month (varies). Senior/AI roles pay significantly more — suggested target band above.",
+    "avg_salaries_full_stack_in_inr": "Approx average reported ≈ ₹6 L – ₹20 L for mid roles; senior specialist roles align with target band above.",
+    "sources": [
+      ":contentReference[oaicite:10]{index=10}",
+      ":contentReference[oaicite:11]{index=11}",
+      ":contentReference[oaicite:12]{index=12}"
+    ]
+  },
+
+  "Japan": {
+    "country_name": "Japan",
+    "job_portals": [
+      "https://japan-dev.com",
+      "https://gaijinpot.com/jobs",
+      "https://www.daijob.com",
+      "https://www.careercross.com",
+      "https://www.linkedin.com/jobs"
+    ],
+    "expected_salary_as_per_current_salary_local": "JPY 6,000,000 - 12,000,000 (annual) — target band for Full-Stack + GenAI skilled hires",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹32 L – ₹64 L",
+    "hiring_agencies_links": [
+      "https://www.rekruit.co.jp (regional recruiters)",
+      "https://www.en-japan.com (En-Japan group)",
+      "https://japan-dev.com/contact (Japan Dev placements)",
+      "https://www.r-agent.com/"
+    ],
+    "cities_to_target": [
+      "Tokyo",
+      "Osaka",
+      "Yokohama",
+      "Fukuoka"
+    ],
+    "avg_salaries_full_stack_local_currency": "Glassdoor / Japan Dev / SalaryExpert show averages around ¥6M–9M for full-stack devs in Tokyo, senior roles 9M–12M+.",
+    "avg_salaries_full_stack_in_inr": "≈ ₹32 L – ₹48 L (avg bands); senior up to ≈ ₹64 L+.",
+    "sources": [
+      ":contentReference[oaicite:13]{index=13}",
+      ":contentReference[oaicite:14]{index=14}",
+      ":contentReference[oaicite:15]{index=15}"
+    ]
+  },
+
+  "South Korea": {
+    "country_name": "South Korea",
+    "job_portals": [
+      "https://dev-korea.com (English-friendly tech jobs)",
+      "https://www.saramin.co.kr",
+      "https://www.jobkorea.co.kr",
+      "https://www.linkedin.com/jobs",
+      "https://global.seoul.go.kr/web/work/workListPage.do?lang=en"
+    ],
+    "expected_salary_as_per_current_salary_local": "KRW 45,000,000 - 90,000,000 (annual) — target band for mid→senior Full-Stack + AI roles",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹28 L – ₹56 L",
+    "hiring_agencies_links": [
+      "https://www.robertwalters.co.kr/",
+      "https://www.michaelpage.co.kr/",
+      "https://www.randstad.co.kr/",
+      "https://www.hays.co.kr/"
+    ],
+    "cities_to_target": [
+      "Seoul",
+      "Pangyo (Gyeonggi tech hub)",
+      "Busan"
+    ],
+    "avg_salaries_full_stack_local_currency": "Glassdoor / SheCodes / regional salary pages show typical full-stack ranges approx ₩35M–₩120M depending on seniority; med ≈ ₩45M–₩90M for experienced roles.",
+    "avg_salaries_full_stack_in_inr": "≈ ₹22 L – ₹72 L (broad range depending on seniority).",
+    "sources": [
+      ":contentReference[oaicite:16]{index=16}",
+      ":contentReference[oaicite:17]{index=17}",
+      ":contentReference[oaicite:18]{index=18}",
+      ":contentReference[oaicite:19]{index=19}"
+    ]
+  },
+
+  "Malaysia": {
+    "country_name": "Malaysia",
+    "job_portals": [
+      "https://www.jobstreet.com.my",
+      "https://www.jobscentral.com.my",
+      "https://www.linkedin.com/jobs",
+      "https://my.indeed.com",
+      "https://www.myfuturejobs.gov.my"
+    ],
+    "expected_salary_as_per_current_salary_local": "MYR 120,000 - 240,000 (annual) — target band for mid→senior Full-Stack + GenAI",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹22 L – ₹44 L",
+    "hiring_agencies_links": [
+      "https://www.hays.com.my/",
+      "https://www.robertwalters.com.my/",
+      "https://www.michaelpage.com.my/",
+      "https://www.randstad.com.my/",
+      "https://www.adecco.com.my/"
+    ],
+    "cities_to_target": [
+      "Kuala Lumpur",
+      "Penang",
+      "Cyberjaya"
+    ],
+    "avg_salaries_full_stack_local_currency": "Indeed / Glassdoor / salary aggregators show mid-level devs around MYR ~6.9k/month (~MYR 83k/year); senior/full-stack with specialization can reach MYR 120k+.",
+    "avg_salaries_full_stack_in_inr": "≈ ₹8 L – ₹22 L (mid) ; senior  ≈ ₹22 L+ (depending on role).",
+    "sources": [
+      ":contentReference[oaicite:20]{index=20}",
+      ":contentReference[oaicite:21]{index=21}",
+      ":contentReference[oaicite:22]{index=22}"
+    ]
+  },
+
+  "Bahrain": {
+    "country_name": "Bahrain",
+    "job_portals": [
+      "https://www.gulftalent.com/bahrain/jobs",
+      "https://www.bayt.com/en/bahrain/jobs",
+      "https://www.linkedin.com/jobs",
+      "https://bh.indeed.com",
+      "https://www.bahrain.bh/en/careers"
+    ],
+    "expected_salary_as_per_current_salary_local": "BHD 9,000 - 18,000 (annual) — target band for senior Full-Stack / GenAI (BHD is small-country scale)",
+    "expected_salary_as_per_current_salary_in_inr": "≈ ₹18 L – ₹36 L",
+    "hiring_agencies_links": [
+      "https://www.charterhouseme.com/",
+      "https://www.robertwalters.me/",
+      "https://www.michaelpage.ae/"
+    ],
+    "cities_to_target": [
+      "Manama"
+    ],
+    "avg_salaries_full_stack_local_currency": "Market data is limited; Gulf job boards and employer listings show variable ranges — mid-level positions often smaller than UAE/Saudi; senior roles competitive with allowances.",
+    "avg_salaries_full_stack_in_inr": "Approx typical mid→senior ranges ≈ ₹12 L – ₹36 L depending on allowances and employer.",
+    "sources": [
+      ":contentReference[oaicite:23]{index=23}",
+      ":contentReference[oaicite:24]{index=24}",
+      ":contentReference[oaicite:25]{index=25}"
+    ]
+  }
+
+
+}

@@ -337,6 +337,47 @@
                     `;
                 }
 
+                if (data && data.job && data.email_cover && data.recruiters) {
+                    html += `
+                        <div class="mt-6 md:mt-8">
+                            <button id="saveJobBtn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md transition-colors hover:bg-indigo-700 w-full" onclick="saveJob()">
+                                Save Job
+                            </button>
+                        </div>
+                    `;
+                }
+
+                function saveJob() {
+                    const saveJobBtn = document.getElementById('saveJobBtn');
+                    saveJobBtn.disabled = true;
+                    saveJobBtn.textContent = 'Saving...';
+
+                    fetch('/api/saveJob', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Job saved successfully!');
+                            window.location.href = '/savedJobs';
+                        } else {
+                            alert('Error occurred while saving the job. Please try again.');
+                        }
+                        saveJobBtn.disabled = false;
+                        saveJobBtn.textContent = 'Save Job';
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('An unexpected error occurred while saving the job. Please try again.');
+                        saveJobBtn.disabled = false;
+                        saveJobBtn.textContent = 'Save Job';
+                    });
+                }
+
                 resDiv.innerHTML = html;
             } catch (e) {
                 console.error(e);

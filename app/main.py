@@ -27,6 +27,10 @@ async def root():
 async def saved_jobs_page():
     return FileResponse("app/static/saved_jobs.html")
 
+@app.get("/country-list")
+async def saved_jobs_page():
+    return FileResponse("app/static/countries.html")
+
 # Run via: uvicorn app.main:app --reload
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
