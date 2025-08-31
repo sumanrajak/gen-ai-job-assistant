@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #e5e7eb;
+            background-color: #f3f4f6; /* bg-gray-100 */
         }
         pre {
             white-space: pre-wrap;
@@ -18,10 +18,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-200">
+<body class="bg-gray-100">
 
     <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
                     <a href="/" class="text-xl font-bold text-indigo-600 flex items-center">
@@ -36,14 +36,37 @@
                         <a href="/country-list" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Country List</a>
                     </div>
                 </div>
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars h-6 w-6 block"></i>
+                        <i class="fas fa-times h-6 w-6 hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/saved-jobs" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Saved Jobs</a>
+                <a href="/" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Analysis</a>
+                <a href="/country-list" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Country List</a>
             </div>
         </div>
     </nav>
 
     <main class="py-8 px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full max-w-7xl mx-auto border border-gray-200">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full max-w-screen-xl mx-auto border border-gray-200">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">Analyze Your Next Career Move</h1>
+                <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">
+                    Paste a job description below and let our AI assistant provide a detailed analysis, including skill matches, company insights, and tailored application materials.
+                </p>
+            </div>
             <!-- Input Section -->
-            <div class="mb-8">
+            <div class="mb-8 max-w-4xl mx-auto">
                 <label for="jd" class="block text-lg font-semibold text-gray-700 mb-2">
                     Paste Job Description:
                 </label>
@@ -61,100 +84,106 @@
     </main>
 
     <script>
+        let currentAnalysisData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.getElementById('mobile-menu-button');
+            if (!menuButton) return;
+
+            const mobileMenu = document.getElementById('mobile-menu');
+            const openIcon = menuButton.querySelector('.fa-bars');
+            const closeIcon = menuButton.querySelector('.fa-times');
+
+            menuButton.addEventListener('click', () => {
+                const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+                menuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+                openIcon.classList.toggle('hidden');
+                closeIcon.classList.toggle('hidden');
+            });
+        });
+
         /**
-         * Copies text from a specified HTML element to the clipboard.
+         * Copies text from a specified HTML element to the clipboard using the modern Clipboard API.
          * @param {string} elementId - The ID of the element to copy from.
+         * @param {HTMLElement} buttonElement - The button that triggered the copy action.
          */
         function copyToClipboard(elementId, buttonElement) {
             const element = document.getElementById(elementId);
+            if (!element) return;
             const textToCopy = element.innerText || element.value;
 
-            // Use a temporary textarea to hold the text for the copy command
-            const tempTextArea = document.createElement("textarea");
-            tempTextArea.value = textToCopy;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Provide user feedback on the button itself
+                const originalText = buttonElement.innerHTML;
+                buttonElement.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                buttonElement.disabled = true;
+                buttonElement.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                buttonElement.classList.add('bg-green-600', 'cursor-not-allowed');
 
-            // Provide user feedback on the button itself
-            const originalText = buttonElement.innerHTML;
-            buttonElement.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
-            buttonElement.classList.remove('bg-indigo-600');
-            buttonElement.classList.add('bg-green-600');
-
-            setTimeout(() => {
-                buttonElement.innerHTML = originalText;
-                buttonElement.classList.remove('bg-green-600');
-                buttonElement.classList.add('bg-indigo-600');
-            }, 2000);
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalText;
+                    buttonElement.disabled = false;
+                    buttonElement.classList.remove('bg-green-600', 'cursor-not-allowed');
+                    buttonElement.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Could not copy text to clipboard.');
+            });
         }
 
         /**
-         * Simulates an API call to analyze a job description.
-         * In a real application, this would be a fetch to a backend service.
+         * Saves the current job analysis data to the backend.
+         * @param {Event} event - The click event.
          */
-        async function fetchMockAnalysis(jobDescription) {
-            // Simulate a network delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Mock data for demonstration purposes
-            if (jobDescription.length < 5) {
-                return {
-                    errors: ["Please provide a more detailed job description to get a useful analysis."]
-                };
+        function saveJob(event) {
+            event.preventDefault();
+            if (!currentAnalysisData) {
+                alert('No analysis data to save.');
+                return;
             }
-            
-            // Randomly generate a fit score for dynamic coloring demonstration
-            const randomFitScore = Math.floor(Math.random() * 100);
 
-            return {
-                job_info: {
-                    "Title": "Senior Software Engineer",
-                    "Company": "Innovate Corp",
-                    "Location": "Remote, San Francisco",
-                    "Experience Level": "5+ years",
-                    "Key Responsibilities": "Design, develop, and deploy scalable microservices. Mentor junior engineers.",
-                    "Skills Required": "Python, AWS, Docker, Kubernetes"
+            const saveJobBtn = document.getElementById('saveJobBtn');
+            saveJobBtn.disabled = true;
+            saveJobBtn.textContent = 'Saving...';
+
+            fetch('/api/save-job', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                fit_eval: {
-                    "fit_score": `${randomFitScore}%`,
-                    "matched_skills": ["Python", "AWS", "Docker"],
-                    "missing_skills": ["Go", "Terraform"],
-                    "summary": "You have a strong background in backend development and cloud technologies, which aligns well with the core requirements. Focus on showcasing your experience with microservices and your leadership skills in your application materials."
-                },
-                email_cover: {
-                    "cold email": {
-                        "subject": "Application for Senior Software Engineer - [Your Name]",
-                        "body": "Dear [Hiring Manager Name],\n\nI am writing to express my enthusiastic interest in the Senior Software Engineer position at Innovate Corp, which I found on LinkedIn. With over 7 years of experience developing and deploying scalable systems using Python, AWS, and Docker, my skills are a strong match for your team's needs. I have a proven track record of leading projects and mentoring junior developers, and I am excited by the opportunity to contribute to Innovate Corp's innovative work in the finance sector.\n\nThank you for your consideration. I have attached my resume and look forward to hearing from you.\n\nBest regards,\n[Your Name]"
-                    },
-                    "cover letter": {
-                        "body": "Dear [Hiring Manager Name],\n\nI am writing to apply for the Senior Software Engineer role at Innovate Corp. My extensive background in building high-performance backend systems, coupled with expertise in Python, cloud technologies like AWS, and containerization with Docker and Kubernetes, makes me an ideal candidate for this position. At my previous company, I spearheaded a project to migrate our monolithic application to a microservices architecture, which resulted in a 30% increase in performance and improved system reliability. I am confident that my skills and experience would enable me to make a significant contribution to your team from day one. I am particularly drawn to Innovate Corp's mission to leverage technology to create a better financial future.\n\nThank you for your time and consideration. I have attached my resume and can be reached at your earliest convenience to discuss how I can help Innovate Corp achieve its goals.\n\nSincerely,\n[Your Name]"
-                    },
-                    "linkedin_networking_message_recruiter": {
-                        "body": "Hi [Recruiter Name], I came across the Senior Software Engineer position at Innovate Corp on LinkedIn and was very impressed with the company's work. With my background in Python and AWS, I believe I could be a great fit for the role. I'd love to connect and learn more about the team. Thanks, [Your Name]."
-                    },
-                    "linkedin_networking_message_hiring_manager": {
-                        "body": "Hello [Hiring Manager Name], I'm a Senior Software Engineer with a strong background in scalable systems and cloud architecture. I was excited to see the opening on your team at Innovate Corp and believe my experience in microservices and mentorship would be a valuable asset. I've attached my resume and would be grateful for the opportunity to discuss my qualifications further. Best, [Your Name]."
-                    }
-                },
-                recruiters: [
-                    "https://www.linkedin.com/in/recruiter-at-innovate-corp",
-                    "https://www.linkedin.com/in/hiring-manager-innovate"
-                ],
-                org_eval: {
-                    company_research_report: {
-                        "Company Mission": "Innovate Corp's mission is to build innovative and scalable solutions for the finance sector.",
-                        "Recent News": "Recently announced a Series C funding round of $50M to expand their AI platform.",
-                        "Company Culture": "Known for a fast-paced, collaborative culture with a strong emphasis on engineering excellence.",
-                        "Key Technologies": "Python, Go, AWS, Docker, Kubernetes, Terraform."
-                    }
+                body: JSON.stringify(currentAnalysisData)
+            })
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(errData => Promise.reject(errData || { message: 'Save failed' }));
                 }
-            };
+                return res.json();
+            })
+            .then(data => {
+                if (data.status === 'saved') {
+                    alert('Job saved successfully!');
+                    window.location.href = '/saved-jobs';
+                } else {
+                    alert(data.message || 'Error occurred while saving the job. Please try again.');
+                }
+            })
+            .catch(err => {
+                console.error('Save job error:', err);
+                alert(err.message || 'An unexpected error occurred while saving the job. Please try again.');
+            })
+            .finally(() => {
+                if (saveJobBtn) {
+                    saveJobBtn.disabled = false;
+                    saveJobBtn.textContent = 'Save Job';
+                }
+            });
         }
 
         async function analyzeJob() {
             const jd = document.getElementById('jd').value;
+            currentAnalysisData = null; // Reset on new analysis
 
             const resDiv = document.getElementById('results');
             resDiv.classList.remove('hidden');
@@ -166,46 +195,24 @@
             `;
 
             try {
+                const formatKey = (key) => key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
                 const response = await fetch('/api/analyze-job', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ job_description: jd })
-                        });
+                });
 
-                        const data = await response.json(); // <- THIS IS REQUIRED
-                        console.log(data);
-
-window.saveJob = function(event) {
-                    event.preventDefault();
-                    const saveJobBtn = document.getElementById('saveJobBtn');
-                    saveJobBtn.disabled = true;
-                    saveJobBtn.textContent = 'Saving...';
-
-                    fetch('/api/save-job', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(res => res.ok ? res.json() : Promise.reject('Save failed'))
-                    .then(data => {
-                        if (data.success) {
-                            alert('Job saved successfully!');
-                            window.location.href = '/savedJobs';
-                        } else {
-                            alert('Error occurred while saving the job. Please try again.');
-                        }
-                        saveJobBtn.disabled = false;
-                        saveJobBtn.textContent = 'Save Job';
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('An unexpected error occurred while saving the job. Please try again.');
-                        saveJobBtn.disabled = false;
-                        saveJobBtn.textContent = 'Save Job';
-                    });
+                if (!response.ok) {
+                    // Handle non-2xx responses
+                    const errorData = await response.json().catch(() => ({})); // Try to parse error, fallback to empty object
+                    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
                 }
+
+                const data = await response.json();
+                currentAnalysisData = data; // Store data for saving
+                console.log(data);
+
                 if (data.errors && data.errors.length > 0) {
                     resDiv.innerHTML = `
                         <div class="p-6 bg-red-100 rounded-xl border border-red-200 text-red-700">
@@ -224,7 +231,7 @@ window.saveJob = function(event) {
 
                 // Fit Evaluation Card (prominent)
                 if (data.fit_eval) {
-                    const score = parseInt(data.fit_eval.fit_score);
+                    const score = parseInt(data.fit_eval.fit_score) || 0;
                     let cardClasses = '';
                     if (score >= 8) {
                         cardClasses = 'bg-gradient-to-br from-green-500 to-emerald-600';
@@ -236,21 +243,27 @@ window.saveJob = function(event) {
 
                     html += `
                         <div class="md:col-span-2 ${cardClasses} text-white rounded-3xl p-6 sm:p-8 shadow-xl">
-                            <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
+                            <h3 class="text-xl sm:text-2xl font-bold mb-4 flex items-center gap-3">
                                 <i class="fas fa-bullseye"></i>
                                 Fit Evaluation
                             </h3>
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-5xl font-extrabold">${data.fit_eval.fit_score}</p>
-                                    <p class="text-lg font-medium text-white/80">Confidence Score</p>
+                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6">
+                                <div class="text-center md:text-left">
+                                    <p class="text-5xl sm:text-6xl font-extrabold">${data.fit_eval.fit_score || 'N/A'}</p>
+                                    <p class="text-base sm:text-lg font-medium text-white/80">Confidence Score</p>
                                 </div>
-                                <div class="text-right text-white/90">
-                                    <p>Matched: <span class="font-semibold">${data.fit_eval.matched_skills.join(", ")}</span></p>
-                                    <p>Missing: <span class="font-semibold">${data.fit_eval.missing_skills.join(", ")}</span></p>
+                                <div class="flex-grow w-full md:w-auto text-left md:text-right text-white/90 space-y-3 text-sm sm:text-base">
+                                    <div>
+                                        <h4 class="font-semibold text-white">Matched Skills:</h4>
+                                        <p>${(data.fit_eval.matched_skills || []).length > 0 ? data.fit_eval.matched_skills.join(", ") : 'None specified'}</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-white">Missing Skills:</h4>
+                                        <p>${(data.fit_eval.missing_skills || []).length > 0 ? data.fit_eval.missing_skills.join(", ") : 'None specified'}</p>
+                                    </div>
                                 </div>
                             </div>
-                            <p class="mt-4 text-white/90">${data.fit_eval.summary}</p>
+                            <p class="mt-6 text-sm sm:text-base text-white/90">${data.fit_eval.summary || ''}</p>
                         </div>
                     `;
                 }
@@ -258,18 +271,18 @@ window.saveJob = function(event) {
                 // Job Info Card
                 if (data.job_info) {
                     html += `
-                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <i class="fas fa-briefcase text-indigo-500"></i>
                                 Job Info
                             </h3>
                             <ul class="space-y-3 text-gray-700">
-                                ${Object.entries(data.job_info).map(([key, val]) => `
-                                    <li class="flex flex-col">
-                                        <strong class="text-indigo-600">${key}:</strong>
-                                        <span>${val}</span>
+                                ${Object.entries(data.job_info).map(([key, val]) => val ? `
+                                    <li class="flex flex-col gap-0.5">
+                                        <strong class="text-sm font-semibold text-gray-500">${formatKey(key)}</strong>
+                                        <span class="text-gray-800 text-sm sm:text-base">${val}</span>
                                     </li>
-                                `).join('')}
+                                ` : '').join('')}
                             </ul>
                         </div>
                     `;
@@ -279,18 +292,18 @@ window.saveJob = function(event) {
                 if (data.org_eval && data.org_eval.company_research_report) {
                     const report = data.org_eval.company_research_report;
                     html += `
-                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <i class="fas fa-building text-indigo-500"></i>
                                 Company Research
                             </h3>
-                            <ul class="space-y-3 text-gray-700">
-                                ${Object.entries(report).map(([key, val]) => `
-                                    <li class="flex flex-col">
-                                        <strong class="text-indigo-600">${key}:</strong>
-                                        <span>${val}</span>
+                            <ul class="space-y-4 text-gray-700">
+                                ${Object.entries(report).map(([key, val]) => val ? `
+                                    <li class="flex flex-col gap-0.5">
+                                        <strong class="text-sm font-semibold text-gray-500">${formatKey(key)}</strong>
+                                        <span class="text-gray-800 text-sm sm:text-base">${val}</span>
                                     </li>
-                                `).join('')}
+                                ` : '').join('')}
                             </ul>
                         </div>
                     `;
@@ -299,15 +312,15 @@ window.saveJob = function(event) {
                 // Recruiters Card
                 if (data.recruiters && data.recruiters.length > 0) {
                     html += `
-                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <i class="fab fa-linkedin text-indigo-500"></i>
                                 Recruiters
                             </h3>
                             <ul class="space-y-2">
                                 ${data.recruiters.map(link => `
                                     <li>
-                                        <a href="${link}" target="_blank" class="text-indigo-600 hover:underline">
+                                        <a href="${link}" target="_blank" class="text-indigo-600 hover:underline text-sm sm:text-base break-all">
                                             ${link}
                                         </a>
                                     </li>
@@ -323,76 +336,80 @@ window.saveJob = function(event) {
                 if (data.email_cover) {
                     html += `
                         <div class="mt-6 md:mt-8 space-y-8">
-                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
-                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            ${data.email_cover["cold email"] ? `
+                            <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fas fa-envelope text-indigo-500"></i>
                                     Cold Email
                                 </h3>
                                 <div class="flex items-center justify-between mb-2">
-                                    <p class="font-semibold text-gray-900">Subject: <span id="coldEmailSubject">${data.email_cover["cold email"].subject}</span></p>
-                                    <button onclick="copyToClipboard('coldEmailSubject', this)" class="bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
+                                    <p class="font-semibold text-gray-900 text-sm sm:text-base">Subject: <span id="coldEmailSubject">${data.email_cover["cold email"].subject || ''}</span></p>
+                                    <button onclick="copyToClipboard('coldEmailSubject', this)" class="bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
                                         <i class="fas fa-copy"></i>
+                                        <span>Copy</span>
                                     </button>
                                 </div>
                                 <div class="relative">
-                                    <pre id="coldEmailBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["cold email"].body}</pre>
-                                    <button onclick="copyToClipboard('coldEmailBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
-                                        <i class="fas fa-copy"></i> Copy
+                                    <pre id="coldEmailBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["cold email"].body || ''}</pre>
+                                    <button onclick="copyToClipboard('coldEmailBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
+                                        <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>
                                 </div>
-                            </div>
+                            </div>` : ''}
+                            ${data.email_cover["cover letter"] ? `
                             <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
-                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fas fa-file-alt text-indigo-500"></i>
                                     Cover Letter
                                 </h3>
                                 <div class="relative">
-                                    <pre id="coverLetterBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["cover letter"].body}</pre>
-                                    <button onclick="copyToClipboard('coverLetterBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
-                                        <i class="fas fa-copy"></i> Copy
+                                    <pre id="coverLetterBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["cover letter"].body || ''}</pre>
+                                    <button onclick="copyToClipboard('coverLetterBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
+                                        <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>
                                 </div>
-                            </div>
-                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
-                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            </div>` : ''}
+                            ${data.email_cover["linkedin_networking_message_recruiter"] ? `
+                            <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fab fa-linkedin text-indigo-500"></i>
                                     LinkedIn Networking Message to Recruiter
                                 </h3>
                                 <div class="relative">
-                                    <pre id="linkedinRecruiterMessageBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["linkedin_networking_message_recruiter"].body}</pre>
-                                    <button onclick="copyToClipboard('linkedinRecruiterMessageBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
-                                        <i class="fas fa-copy"></i> Copy
+                                    <pre id="linkedinRecruiterMessageBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["linkedin_networking_message_recruiter"].body || ''}</pre>
+                                    <button onclick="copyToClipboard('linkedinRecruiterMessageBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
+                                        <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>
                                 </div>
-                            </div>
-                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
-                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            </div>` : ''}
+                            ${data.email_cover["linkedin_networking_message_hiring_manager"] ? `
+                            <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fab fa-linkedin text-indigo-500"></i>
                                     LinkedIn Networking Message to Hiring Manager
                                 </h3>
                                 <div class="relative">
-                                    <pre id="linkedinHiringManagerMessageBody" class="bg-white p-4 rounded-xl border border-gray-300 text-gray-800">${data.email_cover["linkedin_networking_message_hiring_manager"].body}</pre>
-                                    <button onclick="copyToClipboard('linkedinHiringManagerMessageBody', this)" class="absolute top-2 right-2 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700">
-                                        <i class="fas fa-copy"></i> Copy
+                                    <pre id="linkedinHiringManagerMessageBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["linkedin_networking_message_hiring_manager"].body || ''}</pre>
+                                    <button onclick="copyToClipboard('linkedinHiringManagerMessageBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
+                                        <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>
                                 </div>
-                            </div>
+                            </div>` : ''}
                         </div>
                     `;
                 }
 
 
-                if (data ) {
+                if (currentAnalysisData) {
                     html += `
-                        <div class="mt-6 md:mt-8">
-                            <button id="saveJobBtn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md transition-colors hover:bg-indigo-700 w-full" onclick="saveJob(event)">
-                                Save Job
+                        <div class="mt-8 md:mt-10">
+                            <button id="saveJobBtn" class="w-full py-3 px-6 text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 rounded-xl transition-all shadow-md hover:shadow-lg" onclick="saveJob(event)">
+                                Save Job Analysis
                             </button>
                         </div>
                     `;
                 }
 
-               
                 resDiv.innerHTML = html;
             } catch (e) {
                 console.error(e);
@@ -401,7 +418,7 @@ window.saveJob = function(event) {
                         <h3 class="font-bold text-xl mb-2 flex items-center">
                             <i class="fas fa-exclamation-triangle mr-2"></i> An unexpected error occurred.
                         </h3>
-                        <p>Please check your network connection and try again.</p>
+                        <p>${e.message || 'Please check your network connection and try again.'}</p>
                     </div>
                 `;
             }

@@ -6,7 +6,10 @@ from app.db.records_handler import (
     load_application_records,
     mark_as_applied,
     list_sheet_names,
-    load_sheet_data
+    load_sheet_data,
+    toggle_flag_status,
+    update_notes,
+    delete_job_record,
 )
 
 router = APIRouter(prefix="/api")
@@ -24,8 +27,13 @@ class SaveJobRequest(BaseModel):
 
 class ApplyJobRequest(BaseModel):
     job_id: str
-    sheet_name: str = "Sheet1"
 
+class JobIdRequest(BaseModel):
+    job_id: str
+
+class UpdateNotesRequest(BaseModel):
+    job_id: str
+    notes: str
 
 # --------- Routes ---------
 
@@ -57,7 +65,7 @@ def mark_job_applied(req: ApplyJobRequest):
     """
     Mark a saved job as applied.
     """
-    success = mark_as_applied(req.job_id, req.sheet_name)
+    success = mark_as_applied(req.job_id)
     return {"status": "ok" if success else "error"}
 
 @router.get("/sheet-names")
@@ -74,3 +82,27 @@ def get_sheet_data(sheet_name: str):
     """
     data = load_sheet_data(sheet_name)
     return {"data": data if data else []}
+
+@router.post("/toggle-flag")
+def toggle_job_flag(req: JobIdRequest):
+    """
+    Toggle the 'is_flagged' status of a job record.
+    """
+    success = toggle_flag_status(req.job_id)
+    return {"status": "ok" if success else "error"}
+
+@router.put("/update-notes")
+def update_job_notes(req: UpdateNotesRequest):
+    """
+    Update the notes for a specific job record.
+    """
+    success = update_notes(req.job_id, req.notes)
+    return {"status": "ok" if success else "error"}
+
+@router.delete("/delete-job/{job_id}")
+def delete_job(job_id: str):
+    """
+    Delete a job record by its ID.
+    """
+    success = delete_job_record(job_id)
+    return {"status": "ok" if success else "error"}

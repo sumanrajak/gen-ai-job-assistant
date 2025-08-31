@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
+            background: linear-gradient(to bottom right, #f1f5f9, #e2e8f0);
         }
         pre {
             white-space: pre-wrap;
@@ -36,13 +36,27 @@
                         <a href="/country-list" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Country List</a>
                     </div>
                 </div>
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-indigo-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/saved-jobs" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Saved Jobs</a>
+                <a href="/" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Analysis</a>
+                <a href="/country-list" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Country List</a>
             </div>
         </div>
     </nav>
 
     <!-- Main Container -->
-     
-    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full max-w-7xl h-full mt-8 mb-8 border border-gray-200 mx-auto">
+    <div class="bg-white rounded-3xl shadow-2xl p-4 sm:p-8 lg:p-12 w-full max-w-7xl h-full mt-8 mb-8 border border-gray-200 mx-auto">
         <!-- Header -->
         <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center flex items-center justify-center mb-6">
             <span class="text-indigo-600 mr-3">
@@ -63,8 +77,10 @@
             </div>
 
             <!-- Country Tabs -->
-            <div id="country-tabs" class="flex flex-wrap justify-start gap-2 text-sm">
-                <!-- Tabs will be injected here -->
+            <div id="filter-tabs-container" class="relative">
+                <div id="filter-tabs" class="flex items-center gap-2 text-sm overflow-x-auto pb-2 -mb-2">
+                    <!-- Tabs will be injected here -->
+                </div>
             </div>
         </div>
 
@@ -83,125 +99,17 @@
     </div>
 
     <script>
-        // Mock data to simulate the API response
-        const allJobsData = [
-            {
-                "job_id": "job123",
-                "Job_Title": "Senior Software Engineer",
-                "company_name": "Innovate Corp",
-                "location": "Remote",
-                "location_country": "USA",
-                "job_url": "https://example.com/job/123",
-                "fit_score": 85,
-                "Date Saved": "2023-10-26",
-                "fit_matched_skills": "Python, AWS, Docker",
-                "fit_missing_skills": "Go, Terraform",
-                "fit_summary": "Strong background in backend development and cloud technologies. Focus on showcasing experience with microservices and leadership.",
-                "email_cold_subject": "Application for Senior Software Engineer - [Your Name]",
-                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am writing to express my enthusiastic interest in the Senior Software Engineer position at Innovate Corp. With over 7 years of experience developing scalable systems using Python, AWS, and Docker, my skills are a strong match for your team's needs.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]",
-                "cover_letter_body": "Dear [Hiring Manager Name],\n\nI am writing to apply for the Senior Software Engineer role at Innovate Corp. My extensive background in building high-performance backend systems, coupled with expertise in Python, cloud technologies like AWS, and containerization with Docker and Kubernetes, makes me an ideal candidate for this position.\n\nThank you for your time and consideration.\n\nSincerely,\n[Your Name]",
-                "linkedin_message_recruiter": "Hi [Recruiter Name], I came across the Senior Software Engineer position at Innovate Corp on LinkedIn and was very impressed with the company's work. With my background in Python and AWS, I believe I could be a great fit. I'd love to connect and learn more about the team. Thanks, [Your Name].",
-                "linkedin_message_referrer": "Hello [Referrer Name], I'm a Senior Software Engineer with a strong background in scalable systems and cloud architecture. I'm applying for the Senior Software Engineer role at Innovate Corp and would appreciate any insights you might have. Best, [Your Name].",
-                "org_company_name": "Innovate Corp",
-                "org_company_location": "San Francisco, CA",
-                "org_company_size": "201-500 employees",
-                "org_avg_salary_se": "$150,000 - $180,000",
-                "org_recent_layoffs": "No recent layoffs reported.",
-                "recruiter_linkedin_urls": ["https://www.linkedin.com/in/recruiter-at-innovate-corp", "https://www.linkedin.com/in/hiring-manager-innovate"],
-                "is_applied": false
-            },
-            {
-                "job_id": "job456",
-                "Job_Title": "Data Scientist",
-                "company_name": "Quant Labs",
-                "location": "New York, NY",
-                "location_country": "USA",
-                "job_url": "https://example.com/job/456",
-                "fit_score": 62,
-                "Date Saved": "2023-10-25",
-                "fit_matched_skills": "Python, R, Machine Learning",
-                "fit_missing_skills": "Big Data, SQL",
-                "fit_summary": "Solid foundation in data science, but needs to highlight experience with large-scale data processing and database skills.",
-                "email_cold_subject": "Inquiry for Data Scientist position",
-                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am a Data Scientist with a passion for quantitative analysis and a strong foundation in Python and R. Your work at Quant Labs on market prediction models caught my eye, and I believe my skills are well-suited to contribute to your team. I have attached my resume for your review.\n\nSincerely,\n[Your Name]",
-                "cover_letter_body": "Dear [Hiring Manager Name],\n\nI am writing to express my interest in the Data Scientist position at Quant Labs. My experience includes developing predictive models and analyzing large datasets to drive business insights. I am eager to apply my analytical skills and contribute to your team's innovative projects.\n\nSincerely,\n[Your Name]",
-                "linkedin_message_recruiter": "Hi [Recruiter Name], I saw the Data Scientist role at Quant Labs and was immediately interested. My background in machine learning and Python aligns well with the requirements, and I'd love to learn more. Thanks, [Your Name].",
-                "linkedin_message_referrer": "Hello [Referrer Name], I'm a Data Scientist who is applying for a role at Quant Labs. I was hoping you might have a moment to share your experience working there. I'd appreciate any advice you have. Thanks, [Your Name].",
-                "org_company_name": "Quant Labs",
-                "org_company_location": "New York, NY",
-                "org_company_size": "51-200 employees",
-                "org_avg_salary_se": "$130,000 - $160,000",
-                "org_recent_layoffs": "Recent layoffs in the AI division.",
-                "recruiter_linkedin_urls": ["https://www.linkedin.com/in/recruiter-quant-labs"],
-                "is_applied": true
-            },
-            {
-                "job_id": "job789",
-                "Job_Title": "Frontend Developer",
-                "company_name": "Pixel Perfect Inc.",
-                "location": "San Francisco, CA",
-                "location_country": "USA",
-                "job_url": "https://example.com/job/789",
-                "fit_score": 35,
-                "Date Saved": "2023-10-24",
-                "fit_matched_skills": "HTML, CSS, JavaScript",
-                "fit_missing_skills": "React, Vue.js",
-                "fit_summary": "Basic skills are a match, but the role requires significant experience with modern JavaScript frameworks.",
-                "email_cold_subject": "Application for Frontend Developer",
-                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am writing to apply for the Frontend Developer position. While I have a solid foundation in core web technologies, I am actively building my skills in modern frameworks like React and Vue. I am a fast learner and am excited by the opportunity to grow with your team.\n\nSincerely,\n[Your Name]",
-                "cover_letter_body": "Dear [Hiring Manager Name],\n\nI am a passionate Frontend Developer with experience in creating responsive and accessible websites using HTML, CSS, and JavaScript. I am eager to bring my creative problem-solving skills to Pixel Perfect Inc. and contribute to your visual-first approach to web development.\n\nSincerely,\n[Your Name]",
-                "linkedin_message_recruiter": "Hi [Recruiter Name], I'm a Frontend Developer and saw the opening on your team at Pixel Perfect Inc. I'd love to connect and hear more about the role and the company culture. Best, [Your Name].",
-                "linkedin_message_referrer": null, // Example of a missing field
-                "org_company_name": "Pixel Perfect Inc.",
-                "org_company_location": "San Francisco, CA",
-                "org_company_size": "500+ employees",
-                "org_avg_salary_se": "$100,000 - $120,000",
-                "org_recent_layoffs": "Layoffs reported in marketing and design departments.",
-                "recruiter_linkedin_urls": [], // Example of an empty array
-                "is_applied": false
-            },
-             {
-                "job_id": "job101",
-                "Job_Title": "Marketing Manager",
-                "company_name": "Global Marketing Solutions",
-                "location": "London, UK",
-                "location_country": "UK",
-                "job_url": "https://example.com/job/101",
-                "fit_score": 92,
-                "Date Saved": "2023-10-23",
-                "fit_matched_skills": "Digital Marketing, SEO, Content Strategy",
-                "fit_missing_skills": "PPC, Data Analytics",
-                "fit_summary": "Excellent fit for digital marketing expertise. Highlight past successes in content strategy and team leadership.",
-                "email_cold_subject": "Inquiry for Marketing Manager - [Your Name]",
-                "email_cold_body": "Dear [Hiring Manager Name],\n\nI am reaching out to express my keen interest in the Marketing Manager role at Global Marketing Solutions. My background in developing and executing comprehensive digital marketing strategies, coupled with my experience in SEO and content, aligns perfectly with the requirements of this role.\n\nThank you for your time and consideration.\n\nBest regards,\n[Your Name]",
-                "cover_letter_body": "Dear [Hiring Manager Name],\n\nAs an experienced marketing professional with a proven track record of driving brand growth through innovative digital strategies, I am excited to apply for the Marketing Manager position at Global Marketing Solutions. My portfolio demonstrates my ability to lead successful campaigns and build strong online presences.\n\nSincerely,\n[Your Name]",
-                "linkedin_message_recruiter": "Hi [Recruiter Name], I'm very interested in the Marketing Manager opening at Global Marketing Solutions. My experience in digital marketing and content strategy aligns well with the role. I'd love to connect and discuss how I can contribute to your team. Thanks, [Your Name].",
-                "linkedin_message_referrer": "Hello [Referrer Name], I'm a marketing professional applying for a role at Global Marketing Solutions and was hoping for some insights into the company culture and team dynamics. I'd be grateful for a brief chat. Best, [Your Name].",
-                "org_company_name": "Global Marketing Solutions",
-                "org_company_location": "London, UK",
-                "org_company_size": "51-200 employees",
-                "org_avg_salary_se": "£60,000 - £80,000",
-                "org_recent_layoffs": "No recent layoffs reported.",
-                "recruiter_linkedin_urls": ["https://www.linkedin.com/in/recruiter-g-m-s"],
-                "is_applied": false
-            }
-        ];
-
-        let currentCountryFilter = '';
+        let currentJobs = [];
+        let currentActiveFilter = 'All';
         let currentSearchQuery = '';
 
-        // Mock API functions
         async function fetchCountriesApi() {
-            // Simulate API call delay
             let countries= await fetch("/api/sheet-names");
             let countriesData = await countries.json();
-            currentSearchQuery=countriesData.sheet_names[0]
             return countriesData.sheet_names;
         }
 
         async function fetchJobsApi() {
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 500));
             const response = await fetch("/api/saved-jobs");
             
 
@@ -210,8 +118,8 @@
         return;
         }
 
-const mockJobs = await response.json();
-            return mockJobs;
+        const jobs = await response.json();
+            return jobs;
         }
 
         async function fetchJobsByCountryApi(country) {
@@ -269,37 +177,94 @@ const mockJobs = await response.json();
          * @param {string} jobId - The ID of the job to mark as applied.
          */
         async function markAsApplied(jobId) {
-            // Simulate a POST request
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const response = await fetch('/api/mark-applied', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({job_id: jobId, sheet_name: currentCountryFilter})
-            });
-            if (!response.ok) {
-                throw new Error(`Failed to mark job ${jobId} as applied`);
-            }
-            
-            showMessage("Job marked as applied! ✅");
-            // Find and update the job in mockJobs
-            const jobIndex = allJobsData.findIndex(job => job.job_id === jobId);
-            if (jobIndex !== -1) {
-                allJobsData[jobIndex].is_applied = true;
-            }
-            renderDashboard(currentCountryFilter, currentSearchQuery);
+             const response = await fetch('/api/mark-applied', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ job_id: jobId })
+             });
+             if (!response.ok) {
+                 showMessage(`Failed to mark job ${jobId} as applied`, 'error');
+                 return;
+             }
+ 
+             showMessage("Job marked as applied!", 'success');
+             const jobIndex = currentJobs.findIndex(job => String(job.job_id) === String(jobId));
+             if (jobIndex !== -1) {
+                 currentJobs[jobIndex].is_applied = true;
+             }
+             renderDashboard();
         }
 
+        async function toggleFlag(jobId, event) {
+            event.stopPropagation(); // Prevent accordion from toggling
+            const response = await fetch('/api/toggle-flag', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ job_id: jobId })
+            });
+
+            if (!response.ok) {
+                showMessage("Failed to update flag status.", 'error');
+                return;
+            }
+
+            const jobIndex = currentJobs.findIndex(job => String(job.job_id) === String(jobId));
+            if (jobIndex !== -1) {
+                currentJobs[jobIndex].is_flagged = !currentJobs[jobIndex].is_flagged;
+            }
+            showMessage("Flag status updated!", 'success');
+            renderDashboard();
+        }
+
+        async function updateNotes(jobId) {
+            const notesText = document.getElementById(`notes-${jobId}`).value;
+            const response = await fetch('/api/update-notes', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ job_id: jobId, notes: notesText })
+            });
+
+            if (!response.ok) {
+                showMessage("Failed to save notes.", 'error');
+                return;
+            }
+
+            const jobIndex = currentJobs.findIndex(job => String(job.job_id) === String(jobId));
+            if (jobIndex !== -1) {
+                currentJobs[jobIndex].notes = notesText;
+            }
+            showMessage("Notes saved successfully!", 'success');
+        }
+
+        async function deleteJob(jobId) {
+            if (!confirm('Are you sure you want to delete this job record? This action cannot be undone.')) {
+                return;
+            }
+
+            const response = await fetch(`/api/delete-job/${jobId}`, { method: 'DELETE' });
+
+            if (!response.ok) {
+                showMessage("Failed to delete job record.", 'error');
+                return;
+            }
+
+            currentJobs = currentJobs.filter(job => String(job.job_id) !== String(jobId));
+            showMessage("Job record deleted.", 'success');
+            renderDashboard();
+        }
+ 
         /**
          * Displays a custom toast-like message.
          * @param {string} message - The message to display.
+         * @param {string} type - 'success' or 'error'.
          */
-        function showMessage(message) {
+        function showMessage(message, type = 'success') {
             const messageBox = document.getElementById('messageBox');
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
             messageBox.innerHTML = `
-                <div class="p-4 rounded-xl shadow-lg font-semibold text-white bg-green-500">
-                    <i class="fas fa-check-circle mr-2"></i> ${message}
+                <div class="p-4 rounded-xl shadow-lg font-semibold text-white ${bgColor}">
+                    <i class="fas ${icon} mr-2"></i> ${message}
                 </div>
             `;
             messageBox.classList.remove('opacity-0', 'pointer-events-none');
@@ -313,28 +278,14 @@ const mockJobs = await response.json();
 
         /**
          * Renders the jobs dashboard with applied filters.
-         * @param {string} countryFilter - The country to filter by, or 'All'.
-         * @param {string} searchQuery - The search query string.
-         * @param {Array} jobsToRender - Optional array of jobs to render. If not provided, fetches all jobs.
          */
-        async function renderDashboard(countryFilter = 'All', searchQuery = '', jobsToRender = null) {
+        function renderDashboard() {
             const container = document.getElementById("jobAccordion");
-            container.innerHTML = "<div class='p-6 text-center text-gray-500'>Loading saved jobs...</div>";
-            
-            let jobs = jobsToRender;
-            if (!jobs) {
-                 if (countryFilter === 'All') {
-                    jobs = await fetchJobsApi();
-                } else {
-                    jobs = await fetchJobsByCountryApi(countryFilter);
-                }
-            }
-            
-            const filteredJobs = jobs.filter(job => {
-                const matchesSearch = searchQuery === '' || 
-                                      job.Job_Title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                      job.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                      job.location.toLowerCase().includes(searchQuery.toLowerCase());
+            const filteredJobs = currentJobs.filter(job => {
+                const matchesSearch = currentSearchQuery === '' || 
+                                      job.Job_Title.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
+                                      job.company_name.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
+                                      job.location.toLowerCase().includes(currentSearchQuery.toLowerCase());
                 return matchesSearch;
             });
 
@@ -346,6 +297,7 @@ const mockJobs = await response.json();
             container.innerHTML = "";
             filteredJobs.forEach((job, index) => {
                 const isApplied = job.is_applied;
+                const isFlagged = job.is_flagged;
                 const jobId = `job-${index}`;
                 
                 // Determine status badge classes
@@ -353,6 +305,9 @@ const mockJobs = await response.json();
                     ? "bg-green-500 text-white" 
                     : "bg-yellow-400 text-gray-800";
                 const statusBadgeText = isApplied ? "Applied" : "Pending";
+
+                // Determine flag icon classes
+                const flagIconClasses = isFlagged ? 'text-yellow-500' : 'text-gray-400';
 
                 // Determine fit score card classes
                 const score = parseInt(job.fit_score);
@@ -393,9 +348,12 @@ const mockJobs = await response.json();
                     <div class="accordion-header bg-gray-50 flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors"
                          onclick="toggleAccordion('collapse-${jobId}')">
                         <div class="flex-1">
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 flex-wrap">
                                 <h2 class="text-lg font-semibold text-gray-800">${job.Job_Title} @ ${job.company_name}</h2>
                                 <span class="text-xs font-bold px-2 py-1 rounded-full ${statusBadgeClasses}">${statusBadgeText}</span>
+                                <button onclick="toggleFlag('${job.job_id}', event)" class="${flagIconClasses} hover:text-yellow-500 transition-colors text-lg" title="Flag this job">
+                                    <i class="fas fa-flag"></i>
+                                </button>
                             </div>
                             <div class="text-sm text-gray-500 mt-1">${job.location}, ${job.location_country}</div>
                         </div>
@@ -488,11 +446,27 @@ const mockJobs = await response.json();
                                     </ul>
                                 </div>
                             </div>
-                            
-                            <!-- Mark as Applied Button -->
-                            ${!isApplied ? `<button class="w-full mt-6 px-4 py-3 font-bold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors shadow-md" onclick="markAsApplied('${job.job_id}')">
-                                <i class="fas fa-check-circle mr-2"></i> Mark as Applied
-                            </button>` : ''}
+
+                            <!-- Personal Notes -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <h3 class="font-bold text-lg text-indigo-600 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-sticky-note"></i> Personal Notes
+                                </h3>
+                                <textarea id="notes-${job.job_id}" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none" rows="4" placeholder="Add your personal notes here...">${job.notes || ''}</textarea>
+                                <button onclick="updateNotes('${job.job_id}')" class="mt-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors text-sm">
+                                    <i class="fas fa-save mr-1"></i> Save Notes
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center gap-4 mt-6">
+                                ${!isApplied ? `<button class="flex-grow px-4 py-3 font-bold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors shadow-md" onclick="markAsApplied('${job.job_id}')">
+                                    <i class="fas fa-check-circle mr-2"></i> Mark as Applied
+                                </button>` : '<div class="flex-grow"></div>'}
+                                <button class="flex-shrink-0 px-4 py-3 font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shadow-md" onclick="deleteJob('${job.job_id}')" title="Delete Job Record">
+                                    <i class="fas fa-trash-alt mr-2"></i> Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -503,51 +477,77 @@ const mockJobs = await response.json();
         /**
          * Renders the country tabs based on the API data.
          */
-        async function renderCountryTabs() {
-            const tabsContainer = document.getElementById('country-tabs');
-            tabsContainer.innerHTML = "<div class='p-2 text-center text-gray-500'>Loading countries...</div>";
+        async function renderFilterTabs() {
+            const tabsContainer = document.getElementById('filter-tabs');
+            tabsContainer.innerHTML = "<div class='p-2 text-center text-gray-500'>Loading filters...</div>";
             
             const countries = await fetchCountriesApi();
-            const allCountries = [ ...countries];
+            const allFilters = ['All', 'Flagged', ...countries];
 
-            tabsContainer.innerHTML = allCountries.map(country => `
-                <button onclick="setCountryFilter('${country}')"
-                        id="tab-${country.replace(/\s/g, '-')}"
-                        class="px-4 py-2 rounded-full font-semibold transition-colors
-                        ${country === currentCountryFilter ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">
-                    ${country}
-                </button>
-            `).join('');
+            tabsContainer.innerHTML = allFilters.map(filter => {
+                const filterId = filter.replace(/\s/g, '-');
+                const icon = filter === 'Flagged' ? '<i class="fas fa-flag mr-2"></i>' : '';
+                return `
+                    <button onclick="setActiveFilter('${filter}')"
+                            id="tab-${filterId}"
+                            class="flex-shrink-0 px-4 py-2 rounded-full font-semibold transition-colors flex items-center
+                            ${filter === currentActiveFilter ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">
+                        ${icon}${filter}
+                    </button>
+                `;
+            }).join('');
         }
 
         /**
          * Sets the active country filter and re-renders the dashboard.
-         * This function now triggers a new API call to fetch jobs for the selected country.
-         * @param {string} country - The country to filter by.
+         * @param {string} filter - The filter to apply ('All', 'Flagged', or a country name).
          */
-        async function setCountryFilter(country) {
-            currentCountryFilter = country;
-            renderCountryTabs(); // Update the active tab styling
+        async function setActiveFilter(filter) {
+            currentActiveFilter = filter;
+            currentSearchQuery = '';
+            document.getElementById('search-bar').value = '';
+            renderFilterTabs(); // Update the active tab styling
 
             const container = document.getElementById("jobAccordion");
-            container.innerHTML = "<div class='p-6 text-center text-gray-500'>Loading jobs for " + country + "...</div>";
+            container.innerHTML = `<div class='p-6 text-center text-gray-500'>Loading jobs for "${filter}"...</div>`;
 
-            const jobs = country === 'All' ? await fetchJobsApi() : await fetchJobsByCountryApi(country);
-            renderDashboard(currentCountryFilter, currentSearchQuery, jobs);
+            try {
+                if (filter === 'All') {
+                    currentJobs = await fetchJobsApi();
+                } else if (filter === 'Flagged') {
+                    const allJobs = await fetchJobsApi();
+                    currentJobs = allJobs.filter(job => job.is_flagged);
+                } else { // It's a country filter
+                    currentJobs = await fetchJobsByCountryApi(filter);
+                }
+                renderDashboard();
+            } catch (error) {
+                console.error("Failed to fetch jobs:", error);
+                container.innerHTML = "<p class='p-6 text-center text-red-500'>❌ Failed to load jobs.</p>";
+            }
         }
-
-        // Event listener for the search bar
-        document.getElementById('search-bar').addEventListener('input', (event) => {
-            currentSearchQuery = event.target.value;
-            // Get the jobs currently displayed and filter them locally
-            const jobsInView = allJobsData.filter(job => currentCountryFilter === 'All' || job.location_country === currentCountryFilter);
-            renderDashboard(currentCountryFilter, currentSearchQuery, jobsInView);
-        });
 
         // Initial render on page load
         (async () => {
-            await renderCountryTabs();
-            await renderDashboard();
+            // Hamburger menu logic
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.querySelector('i').classList.toggle('fa-bars');
+                mobileMenuButton.querySelector('i').classList.toggle('fa-times');
+            });
+
+            // Search bar listener
+            document.getElementById('search-bar').addEventListener('input', (event) => {
+                currentSearchQuery = event.target.value;
+                renderDashboard();
+            });
+
+            await renderFilterTabs();
+            await setActiveFilter('All');
         })();
     </script>
 </body>

@@ -4,7 +4,7 @@ import re
 import os
 
 class GroqLLM(BaseLLM):
-    def __init__(self, api_key: str = None, model: str = "llama3-70b-8192"):
+    def __init__(self, api_key: str = None, model: str = "llama-3.3-70b-versatile"):
         self.api_key = api_key or os.getenv("GROQ_API_KEY")
         self.client = OpenAI(
             base_url="https://api.groq.com/openai/v1",

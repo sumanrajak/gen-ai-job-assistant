@@ -1,250 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Job Market Analysis</title>
-    <!-- The CSS is embedded here for a single-file solution -->
     <style>
+        /* Custom font from Google Fonts */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            background-color: #f4f7fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        header {
-            background-color: #ffffff;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            margin: 0;
-            color: #007bff;
-        }
-        .container {
-            max-width: 100%; /* Use full screen width */
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .search-bar {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .search-bar input {
-            width: 80%;
-            max-width: 500px;
-            padding: 12px 20px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-        .search-bar input:focus {
-            border-color: #007bff;
-        }
-        .accordion-item {
-            background-color: #ffffff;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .accordion-button {
-            background-color: #ffffff;
-            color: #333;
-            cursor: pointer;
-            padding: 18px;
-            width: 100%;
-            text-align: left;
-            border: none;
-            outline: none;
-            transition: background-color 0.3s ease;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .accordion-button:hover {
-            background-color: #e9ecef;
-        }
-        .accordion-button .icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-        .accordion-button.active .icon {
-            transform: rotate(180deg);
-        }
+
+        /* Accordion transition styles */
         .accordion-content {
-            padding: 0 18px;
-            background-color: #f9f9f9;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            border-radius: 0 0 8px 8px;
-        }
-        .accordion-content-inner {
-            padding: 18px 0;
-            border-top: 1px solid #e0e0e0;
-        }
-        .content-section {
-            margin-bottom: 15px;
-        }
-        .content-section h3 {
-            color: #007bff;
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-        li {
-            margin-bottom: 8px;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .link-button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
-        }
-        .link-button:hover {
-            background-color: #0056b3;
-        }
-        /* Two-column layout styling */
-        .two-column-layout {
-            display: grid;
-            grid-template-columns: 1fr; /* Default to a single column on small screens */
-            gap: 20px;
-            padding: 0 20px;
-        }
-        @media (min-width: 768px) {
-            .two-column-layout {
-                grid-template-columns: 1fr 1fr; /* Two columns on screens larger than 768px */
-            }
-        }
-        /* Navbar Styles */
-        .navbar {
-            background: #fff;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.1rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .navbar-container {
-            display: flex;
-            justify-content: space-between;
-            height: 60px;
-            z-index: 1;
-            width: 100%;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .navbar-logo {
-            color: #007bff;
-            justify-self: start;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            font-weight: 700;
-        }
-
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            list-style: none;
-            text-align: center;
-        }
-
-        .nav-item {
-            height: 60px;
-        }
-
-        .nav-links {
-            color: #333;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            padding: 0 1rem;
-            height: 100%;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .nav-links:hover {
-            color: #007bff;
-        }
-
-        .nav-links.active {
-            border-bottom: 3px solid #007bff;
-            color: #007bff;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800">
 
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="/" class="navbar-logo">Job Assistant</a>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="/saved-jobs" class="nav-links">Saved Jobs</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/" class="nav-links">Analysis</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/country-list" class="nav-links active">Country List</a>
-                </li>
-            </ul>
+     <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-xl font-bold text-indigo-600 flex items-center">
+                        <i class="fas fa-robot mr-2"></i>
+                        <span>GenAI Job Assistant</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/saved-jobs" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" >Saved Jobs</a>
+                        <a href="/" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Analysis</a>
+                        <a href="/country-list" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Country List</a>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                        <span class="sr-only">Open main menu</span>
+                        <!-- Icon for menu open -->
+                        <svg id="menu-open-icon" class="h-6 w-6 block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                        <!-- Icon for menu close -->
+                        <svg id="menu-close-icon" class="h-6 w-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/saved-jobs" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Saved Jobs</a>
+                <a href="/" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Analysis</a>
+                <a href="/country-list" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Country List</a>
+            </div>
         </div>
     </nav>
 
-    <header>
-        <h1>Global Job Market Analysis</h1>
-    </header>
-
-    <main class="container">
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search for a country or city...">
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-3">Global Job Market Analysis</h1>
+            <p class="text-lg text-gray-500">Find job market insights for countries around the world.</p>
+            <div class="mt-8 max-w-2xl mx-auto">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search for a country or city..." class="w-full p-4 pl-12 text-lg border border-gray-300 rounded-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+            </div>
         </div>
         <div id="accordion-container">
             <!-- Accordion will be generated here -->
         </div>
     </main>
 
-    <!-- The JavaScript is embedded here for a single-file solution -->
     <script>
-        // A self-executing anonymous function to prevent global scope pollution
         (function() {
-            // The JSON data is directly embedded as a JavaScript object
             const data={
   "Canada": {
     "country_name": "Canada",
@@ -810,132 +648,126 @@
 
 
 }
-
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuOpenIcon = document.getElementById('menu-open-icon');
+            const menuCloseIcon = document.getElementById('menu-close-icon');
             const container = document.querySelector('#accordion-container');
             const searchInput = document.querySelector('#searchInput');
 
-            // Function to create a list of links
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuOpenIcon.classList.toggle('hidden');
+                menuCloseIcon.classList.toggle('hidden');
+            });
+
             function createLinkList(links, title) {
                 if (!links || links.length === 0) return '';
                 const listItems = links.map(link => {
-                    // Extract a clean URL for the href
                     const cleanLink = link.split(' ')[0];
-                    // Display the full link text, including any descriptions
                     const displayText = link;
-                    return `<li><a href="${cleanLink}" target="_blank" rel="noopener noreferrer">${displayText}</a></li>`;
+                    return `<li class="mb-2"><a href="${cleanLink}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-800 hover:underline break-all">${displayText}</a></li>`;
                 }).join('');
-                const buttonHtml = links.length > 0 ? `<button class="link-button" data-links='${JSON.stringify(links)}'>Open All Links</button>` : '';
+                const buttonHtml = links.length > 0 ? `<button class="link-button mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition text-sm font-medium" data-links='${JSON.stringify(links)}'>Open All Links</button>` : '';
                 return `
-                    <div class="content-section">
-                        <h3>${title}</h3>
-                        <ul>${listItems}</ul>
+                    <div class="content-section mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">${title}</h3>
+                        <ul class="list-none p-0 m-0">${listItems}</ul>
                         ${buttonHtml}
                     </div>
                 `;
             }
 
-            // Function to create a list of simple text items
             function createTextList(items, title) {
                 if (!items || items.length === 0) return '';
-                const listItems = items.map(item => `<li>${item}</li>`).join('');
+                const listItems = items.map(item => `<li class="mb-1 bg-indigo-50 text-indigo-800 rounded-full px-3 py-1 inline-block text-sm font-medium">${item}</li>`).join(' ');
                 return `
-                    <div class="content-section">
-                        <h3>${title}</h3>
-                        <ul>${listItems}</ul>
+                    <div class="content-section mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">${title}</h3>
+                        <ul class="list-none p-0 m-0 flex flex-wrap gap-2">${listItems}</ul>
                     </div>
                 `;
             }
 
-            // Function to create an accordion item
             function createAccordionItem(countryName, countryData) {
                 const item = document.createElement('div');
-                item.className = 'accordion-item';
+                item.className = `accordion-item bg-white rounded-xl shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg`;
 
                 const button = document.createElement('button');
-                button.className = 'accordion-button';
+                button.className = 'accordion-button w-full p-5 text-left text-xl font-bold text-gray-800 flex justify-between items-center';
                 button.innerHTML = `
-                    ${countryName}
-                    <span class="icon">▼</span>
+                    <span>${countryName}</span>
+                    <i class="icon fas fa-chevron-down transition-transform duration-300"></i>
                 `;
                 item.appendChild(button);
 
                 const content = document.createElement('div');
-                content.className = 'accordion-content';
+                content.className = 'accordion-content max-h-0';
 
                 const contentInner = document.createElement('div');
-                contentInner.className = 'accordion-content-inner';
+                contentInner.className = 'accordion-content-inner p-5 border-t border-gray-200';
 
-                // Add all content sections to the accordion panel
                 contentInner.innerHTML = `
-                    <div class="content-section">
-                        <h3>Expected Salary</h3>
-                        <p><strong>Local Currency:</strong> ${countryData.expected_salary_as_per_current_salary_local}</p>
-                        <p><strong>In INR:</strong> ${countryData.expected_salary_as_per_current_salary_in_inr}</p>
-                    </div>
-                    <div class="content-section">
-                        <h3>Average Full Stack Salary</h3>
-                        <p><strong>Local Currency:</strong> ${countryData.avg_salaries_full_stack_local_currency}</p>
-                        <p><strong>In INR:</strong> ${countryData.avg_salaries_full_stack_in_inr}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="content-section">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Expected Salary</h3>
+                            <p class="text-gray-600"><strong class="font-medium text-gray-700">Local:</strong> ${countryData.expected_salary_as_per_current_salary_local}</p>
+                            <p class="text-gray-600"><strong class="font-medium text-gray-700">In INR:</strong> ${countryData.expected_salary_as_per_current_salary_in_inr}</p>
+                        </div>
+                        <div class="content-section">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Average Full Stack Salary</h3>
+                            <p class="text-gray-600"><strong class="font-medium text-gray-700">Local:</strong> ${countryData.avg_salaries_full_stack_local_currency}</p>
+                            <p class="text-gray-600"><strong class="font-medium text-gray-700">In INR:</strong> ${countryData.avg_salaries_full_stack_in_inr}</p>
+                        </div>
                     </div>
                     ${createLinkList(countryData.job_portals, 'Job Portals')}
                     ${createLinkList(countryData.hiring_agencies_links, 'Hiring Agencies')}
                     ${createTextList(countryData.cities_to_target, 'Cities to Target')}
                 `;
-
                 content.appendChild(contentInner);
                 item.appendChild(content);
 
                 return item;
             }
 
-            // Function to render the accordions based on the provided data
             function renderAccordions(dataToRender) {
                 container.innerHTML = ''; // Clear existing content
+                if (Object.keys(dataToRender).length === 0) {
+                    container.innerHTML = `<p class="text-center text-gray-500 text-lg">No countries found matching your search.</p>`;
+                    return;
+                }
+
                 const countryKeys = Object.keys(dataToRender);
-                const midpoint = Math.ceil(countryKeys.length / 2);
-                const leftKeys = countryKeys.slice(0, midpoint);
-                const rightKeys = countryKeys.slice(midpoint);
-
-                // Create the two-column layout divs
+                
                 const twoColumnLayout = document.createElement('div');
-                twoColumnLayout.className = 'two-column-layout';
-                const leftColumn = document.createElement('div');
-                const rightColumn = document.createElement('div');
+                twoColumnLayout.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
 
-                // Generate content for the left column
-                leftKeys.forEach(country => {
+                countryKeys.forEach(country => {
                     const accordionItem = createAccordionItem(country, dataToRender[country]);
-                    leftColumn.appendChild(accordionItem);
+                    twoColumnLayout.appendChild(accordionItem);
                 });
 
-                // Generate content for the right column
-                rightKeys.forEach(country => {
-                    const accordionItem = createAccordionItem(country, dataToRender[country]);
-                    rightColumn.appendChild(accordionItem);
-                });
-
-                twoColumnLayout.appendChild(leftColumn);
-                twoColumnLayout.appendChild(rightColumn);
                 container.appendChild(twoColumnLayout);
 
-                // Re-add event listeners for accordion behavior
                 document.querySelectorAll('.accordion-button').forEach(button => {
                     button.addEventListener('click', () => {
                         const content = button.nextElementSibling;
+                        const icon = button.querySelector('.icon');
+                        
                         button.classList.toggle('active');
+                        icon.classList.toggle('rotate-180');
 
-                        if (button.classList.contains('active')) {
-                            content.style.maxHeight = content.scrollHeight + 'px';
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
                         } else {
-                            content.style.maxHeight = '0';
+                            content.style.maxHeight = content.scrollHeight + 'px';
                         }
                     });
                 });
 
-                // Re-add event listeners for the "Open All Links" buttons
                 document.querySelectorAll('.link-button').forEach(button => {
                     button.addEventListener('click', (event) => {
-                        event.stopPropagation(); // Prevent the accordion from toggling
+                        event.stopPropagation();
                         const links = JSON.parse(event.target.dataset.links);
                         links.forEach(link => {
                             const actualLink = link.split(' ')[0]; 
@@ -945,10 +777,8 @@
                 });
             }
 
-            // Initial rendering of all countries
             renderAccordions(data);
 
-            // Add event listener for the search bar
             searchInput.addEventListener('keyup', (event) => {
                 const searchTerm = event.target.value.toLowerCase();
                 const filteredData = {};
