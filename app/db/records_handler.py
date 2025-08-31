@@ -7,6 +7,7 @@ EXCEL_DB_PATH = "job_application_records.xlsx"
 
 def save_application_record(job_info, fit_eval, email_gen, org_eval=None, recruiter_data=None):
     record = {
+
         "Date Saved": date.today().isoformat(),
         "Job_Title": job_info.get("Job_Title", ""),
         "job_id": job_info.get("job_id", ""),
@@ -31,7 +32,6 @@ def save_application_record(job_info, fit_eval, email_gen, org_eval=None, recrui
         "recruiter_linkedin_urls": json.dumps(recruiter_data) if recruiter_data else "[]",
         "is_applied": False
     }
-
     df = pd.DataFrame([record])
     if os.path.exists(EXCEL_DB_PATH):
         existing = pd.read_excel(EXCEL_DB_PATH)
@@ -45,11 +45,15 @@ def load_application_records():
     df = pd.read_excel(EXCEL_DB_PATH)
     return df.fillna("").to_dict(orient="records")
 
-def mark_as_applied(job_id: str):
+def mark_as_applied(job_id: str,sheet_name="Sheet1"):
+    print(f"Marking job_id {job_id} as applied.")
     if not os.path.exists(EXCEL_DB_PATH):
         return False
-    df = pd.read_excel(EXCEL_DB_PATH)
+    with pd.ExcelFile(EXCEL_DB_PATH) as xls:
+        df = pd.read_excel(xls, sheet_name=sheet_name)
+    print(df["job_id"].values)
     if job_id not in df["job_id"].values:
+        print(f"job_id {job_id} not found.")
         return False
     df.loc[df["job_id"] == job_id, "is_applied"] = True
     df.to_excel(EXCEL_DB_PATH, index=False)

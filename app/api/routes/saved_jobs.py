@@ -24,6 +24,7 @@ class SaveJobRequest(BaseModel):
 
 class ApplyJobRequest(BaseModel):
     job_id: str
+    sheet_name: str = "Sheet1"
 
 
 # --------- Routes ---------
@@ -56,7 +57,7 @@ def mark_job_applied(req: ApplyJobRequest):
     """
     Mark a saved job as applied.
     """
-    success = mark_as_applied(req.job_id)
+    success = mark_as_applied(req.job_id, req.sheet_name)
     return {"status": "ok" if success else "error"}
 
 @router.get("/sheet-names")

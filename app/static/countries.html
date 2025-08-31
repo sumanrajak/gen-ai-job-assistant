@@ -18,7 +18,6 @@
             padding: 20px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
         }
         h1 {
             margin: 0;
@@ -142,9 +141,91 @@
                 grid-template-columns: 1fr 1fr; /* Two columns on screens larger than 768px */
             }
         }
+        /* Navbar Styles */
+        .navbar {
+            background: #fff;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            height: 60px;
+            z-index: 1;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .navbar-logo {
+            color: #007bff;
+            justify-self: start;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            text-align: center;
+        }
+
+        .nav-item {
+            height: 60px;
+        }
+
+        .nav-links {
+            color: #333;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 0 1rem;
+            height: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-links:hover {
+            color: #007bff;
+        }
+
+        .nav-links.active {
+            border-bottom: 3px solid #007bff;
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">Job Assistant</a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/saved-jobs" class="nav-links">Saved Jobs</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/" class="nav-links">Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/country-list" class="nav-links active">Country List</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
     <header>
         <h1>Global Job Market Analysis</h1>

@@ -18,10 +18,31 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center min-h-screen w-full">
+<body class="min-h-screen w-full">
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-xl font-bold text-indigo-600 flex items-center">
+                        <i class="fas fa-robot mr-2"></i>
+                        <span>GenAI Job Assistant</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/saved-jobs" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Saved Jobs</a>
+                        <a href="/" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Analysis</a>
+                        <a href="/country-list" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Country List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <!-- Main Container -->
-    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full max-w-7xl h-full mt-8 mb-8 border border-gray-200">
+     
+    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full max-w-7xl h-full mt-8 mb-8 border border-gray-200 mx-auto">
         <!-- Header -->
         <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center flex items-center justify-center mb-6">
             <span class="text-indigo-600 mr-3">
@@ -166,7 +187,7 @@
             }
         ];
 
-        let currentCountryFilter = 'All';
+        let currentCountryFilter = '';
         let currentSearchQuery = '';
 
         // Mock API functions
@@ -174,7 +195,7 @@
             // Simulate API call delay
             let countries= await fetch("/api/sheet-names");
             let countriesData = await countries.json();
-            
+            currentSearchQuery=countriesData.sheet_names[0]
             return countriesData.sheet_names;
         }
 
@@ -250,6 +271,16 @@ const mockJobs = await response.json();
         async function markAsApplied(jobId) {
             // Simulate a POST request
             await new Promise(resolve => setTimeout(resolve, 500));
+            const response = await fetch('/api/mark-applied', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({job_id: jobId, sheet_name: currentCountryFilter})
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to mark job ${jobId} as applied`);
+            }
             
             showMessage("Job marked as applied! ✅");
             // Find and update the job in mockJobs
@@ -337,8 +368,19 @@ const mockJobs = await response.json();
                 const card = document.createElement("div");
                 card.className = "rounded-xl shadow-lg border border-gray-200 overflow-hidden";
                 
-                const recruiterLinks = (job.recruiter_linkedin_urls && job.recruiter_linkedin_urls.length > 0) 
-                    ? JSON.parse(job.recruiter_linkedin_urls).map(link => `
+                let recruiterUrls = job.recruiter_linkedin_urls;
+                if (recruiterUrls && typeof recruiterUrls === 'string') {
+                    try {
+                        // Handle cases where the API returns a stringified array
+                        recruiterUrls = JSON.parse(recruiterUrls);
+                    } catch (e) {
+                        console.error(`Failed to parse recruiter_linkedin_urls for job ${job.job_id}:`, recruiterUrls);
+                        recruiterUrls = [];
+                    }
+                }
+
+                const recruiterLinks = (recruiterUrls && recruiterUrls.length > 0) 
+                    ? recruiterUrls.map(link => `
                         <li>
                             <a href="${link}" target="_blank" class="text-indigo-600 hover:underline">
                                 ${link}
