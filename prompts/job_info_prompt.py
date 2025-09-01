@@ -7,7 +7,7 @@ JOB_INFO_SCHEMA = {
     "location_country": "string",
     "job_id": "string",
     "job_url": "string",
-    "Remote/Onsite": "Remote | Hybrid | Onsite | Unknown",
+    "Remote/Onsite": "string",
     "Job_Description": "string",
     "Responsibilities": "string",
     "Requirements": "string",

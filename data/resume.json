@@ -4,7 +4,8 @@
       "phone": "7001396147",
       "email": "sumanrajak2001@gmail.com",
       "location": "Bangalore, Karnataka, India",
-      "linkedin": "https://linkedin.com/in/sumanrajak",
+      "linkedin": "https://www.linkedin.com/in/suman-rajak-730021196/",
+      "github": "https://github.com/sumanrajak",
       "portfolio": "https://meetsuman.vercel.app"
     },
     "summary": "Full Stack & AI Engineer with 4+ years of experience delivering scalable web applications and cutting-edge Generative AI solutions. Proven leader in full-stack development (FastAPI, Python, React) within robust cloud environments (AWS) and scalable database solutions. Expertise spans advanced Generative AI capabilities, including RAG, LLM integration, vector databases, and embedding-based search. Track record of leading modules, providing technical solutions, and building production-grade, end-to-end AI-powered features with optimized backend performance.",
@@ -17,55 +18,8 @@
       "tools_technologies": ["Git", "Postman", "Jira", "VS Code", "Figma", "Swagger", "Linux"],
       "methodologies": ["Agile", "Scrum", "TDD"],
       "other_skills": ["RESTful APIs", "GraphQL", "Microservices", "Unit Testing", "Performance Optimization" ]
-    },
-    "professional_experience": [
-      {
-        "company": "Fractal.ai",
-        "location": "Bengaluru, India",
-        "position": "Full Stack Engineer",
-        "duration": "Aug 2024 - Present",
-        "details": [
-          "Led backend development for a high-throughput transaction service, designing Nest.js APIs and MSSQL schemas, optimizing logic and testing, while also contributing to frontend development.",
-          "Architected and contributed to a Generative AI platform for a major pharmaceutical client, focusing on full-stack development, AI integration, and scalable cloud infrastructure.",
-          "Project Bristol Myers Squibb (BMS) – GenAI-Based Content Tagging System (Feb 2025 - Present): Led the end-to-end development of a high-performance GenAI content extraction and tagging system, overseeing a team and providing technical leadership.",
-          "Applied advanced GenAI capabilities including LLM-based tag generation (AWS Bedrock) leveraging OpenSearch for efficient embedding storage and similarity search, increasing accuracy by 70%.",
-          "Developed robust full-stack components including FastAPI backend and responsive React frontend within a scalable AWS serverless ecosystem.",
-          "Project Bank of China Aviation - CRMS (Aug 2024 - Feb 2025): Designed and developed a high-throughput transaction service backend with Nest.js and MSSQL, implemented testing and optimized database queries, reducing latency by 30%."
-        ]
-      },
-      {
-        "company": "Softway",
-        "location": "Bengaluru, India",
-        "position": "Software Engineer",
-        "duration": "Jun 2021 - Aug 2024",
-        "details": [
-          "Architected and developed enterprise web applications using Node.js, React, GraphQL, cloud services; delivered scalable RESTful APIs and optimized database queries.",
-          "Collaborated cross-functionally to implement features and contributed to AI and AR projects integrating deep learning and computer vision.",
-          "Project Daikin - Showroom AR App (Nov 2022 - Aug 2024): Led full-stack development for an immersive AR product configurator with Electron.js, React Native, and Node.js, applying deep learning for enhanced user experience.",
-          "Managed complex AR and IoT modules for seamless frontend-backend integration and high performance."
-        ]
-      },
-      {
-        "company": "Infoware India Pvt. Ltd.",
-        "location": "Ahmedabad, India",
-        "position": "Full Stack Developer Intern",
-        "duration": "Mar 2021 - May 2021",
-        "details": [
-          "Developed React and Node.js applications; deployed stable releases on schedule.",
-          "Executed backend services and contributed to API design and database integration."
-        ]
-      },
-      {
-        "company": "Creesync Software Technologies",
-        "location": "Noida, India",
-        "position": "React Developer Intern",
-        "duration": "Nov 2020 - Mar 2021",
-        "details": [
-          "Built reusable React components and unit tests with React Testing Library.",
-          "Contributed to major client projects (Mamaearth, Lotus) ensuring UI consistency."
-        ]
-      }
-    ]
+    }
+   
     
   }
   

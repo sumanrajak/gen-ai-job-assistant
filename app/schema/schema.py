@@ -40,27 +40,27 @@ class AdditionalInfo(BaseModel):
     Perks: List[str]
 
 class JobInfoSchema(BaseModel):
-    Job_Title: str
-    company_name: str
-    location: str
-    location_country: str
-    job_id: str
-    job_url: str
-    Remote_Onsite: Literal["Remote", "Hybrid", "Onsite", "Unknown"] = Field(..., alias="Remote/Onsite")
-    Job_Description: str
-    Responsibilities: str
-    Requirements: str
-    Skills: List[str]
-    Job_Function: str
-    recruiter_contact_no: str = Field(..., alias="recruiter_contact no")
-    recruiter_email: str
-    Salary_Range: str
-    Experience_Required: str
-    Posted_Date: str
-    visa_sponsorship: Literal["Yes", "No", "Unknown"]
-    reloation_provided: Literal["Yes", "No", "Unknown"]
-    summery: str
-    Additional_Info: AdditionalInfo
+    Job_Title: Optional[str] = None
+    company_name: Optional[str] = None
+    location: Optional[str] = None
+    location_country: Optional[str] = None
+    job_id: Optional[str] = None
+    job_url: Optional[str] = None
+    Remote_Onsite: Optional[str] = None
+    Job_Description: Optional[str] = None
+    Responsibilities: Optional[str] = None
+    Requirements: Optional[str] = None
+    Skills: Optional[List[str]] = None
+    Job_Function: Optional[str] = None
+    recruiter_contact_no: Optional[str] = Field(None, alias="recruiter_contact no")
+    recruiter_email: Optional[str] = None
+    Salary_Range: Optional[str] = None
+    Experience_Required: Optional[str] = None
+    Posted_Date: Optional[str] = None
+    visa_sponsorship: Optional[Literal["Yes", "No", "Unknown"]] = None
+    reloation_provided: Optional[Literal["Yes", "No", "Unknown"]] = None
+    summery: Optional[str] = None
+    Additional_Info: Optional[AdditionalInfo] = None
 
 
 # ---------------- Org Evaluator ----------------
