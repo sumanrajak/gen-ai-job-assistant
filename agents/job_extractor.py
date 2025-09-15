@@ -5,6 +5,7 @@ import logging
 import json
 from prompts.job_info_prompt import JOB_INFO_SCHEMA, JOB_INFO_PROMPT_TEMPLATE
 from utils.prompt_runner import run_json_prompt
+from app.schema.schema import JobInfoSchema
 
 class JobInfoExtractor:
     def __init__(self, llm):
@@ -31,5 +32,6 @@ class JobInfoExtractor:
             "job_text": job_text,
             "job_info_schema": json.dumps(JOB_INFO_SCHEMA),
             "url": url
-        }, JOB_INFO_SCHEMA)
+        }, JobInfoSchema)
+        print(job_info)
         return job_text, job_info

@@ -32,17 +32,19 @@ You are an advanced AI agent specialized in precisely extracting and structuring
 Your goal is to thoroughly parse the provided job posting text and output the details into a structured JSON format.
 special instructions:
 
-* **Summery:** Include a brief summary of the job posting in the output.include the responsibility
-skills and experience required  in the summary word limit 500 to 600.
-* **Tech Stack:** Identify and list all relevant technologies, programming languages, frameworks, and tools mentioned in the job description.
-* **Perks:** Extract any benefits or perks offered by the company, such as health insurance
-, retirement plans, remote work options, etc.
-visa sponsorship and relocation provided should be mentioned if mentioned in the job description.
-job_id should be extracted from the url if available or from the job description. or randomly generate a unique id if not available.
-* ** extract url info** try to extact info from {url} like job_id .
+* **Summary:** Create a detailed summary of the job posting, between 500 and 600 words. It should cover responsibilities, required skills, and experience.
+* **Tech Stack:** Inside `additional_info`, identify and list all relevant technologies, programming languages, frameworks, and tools mentioned.
+* **Perks:** Inside `additional_info`, extract any benefits or perks offered (e.g., health insurance, retirement plans, remote work options).
+* **Visa and Relocation:** For `visa_sponsorship` and `relocation_provided`, respond with "Yes", "No", or "Unknown".
+* **Job ID:** Extract the `job_id` from the URL or job description. If not available, generate a unique ID.
+* **URL Info:** Try to extract information from the job URL ({url}), such as the `job_id`.
 
-Respond strictly inside <json></json> tags in JSON format matching this schema:
+Respond strictly inside <json></json> tags. The JSON object must conform to the following schema.
+Do not include any explanations or text outside of the JSON object.
+
+Schema:
 {job_info_schema}
+
 Job Posting:
 {job_text}
 '''

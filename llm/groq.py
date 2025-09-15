@@ -24,7 +24,14 @@ class GroqLLM(BaseLLM):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.1,
-            max_tokens=1000
+            max_tokens=1000,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "product_review",
+                    "schema": response_schema.model_json_schema()
+                }
+    }
         )
 
         answer = response.choices[0].message.content

@@ -336,60 +336,60 @@
                 if (data.email_cover) {
                     html += `
                         <div class="mt-6 md:mt-8 space-y-8">
-                            ${data.email_cover["cold email"] ? `
+                            ${data.email_cover["cold_email"] ? `
                             <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fas fa-envelope text-indigo-500"></i>
                                     Cold Email
                                 </h3>
                                 <div class="flex items-center justify-between mb-2">
-                                    <p class="font-semibold text-gray-900 text-sm sm:text-base">Subject: <span id="coldEmailSubject">${data.email_cover["cold email"].subject || ''}</span></p>
+                                    <p class="font-semibold text-gray-900 text-sm sm:text-base">Subject: <span id="coldEmailSubject">${data.email_cover["cold_email"].subject || ''}</span></p>
                                     <button onclick="copyToClipboard('coldEmailSubject', this)" class="bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
                                         <i class="fas fa-copy"></i>
                                         <span>Copy</span>
                                     </button>
                                 </div>
                                 <div class="relative">
-                                    <pre id="coldEmailBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["cold email"].body || ''}</pre>
+                                    <pre id="coldEmailBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["cold_email"].body || ''}</pre>
                                     <button onclick="copyToClipboard('coldEmailBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
                                         <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>
                                 </div>
                             </div>` : ''}
-                            ${data.email_cover["cover letter"] ? `
+                            ${data.email_cover["cover_letter"] ? `
                             <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fas fa-file-alt text-indigo-500"></i>
                                     Cover Letter
                                 </h3>
                                 <div class="relative">
-                                    <pre id="coverLetterBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["cover letter"].body || ''}</pre>
+                                    <pre id="coverLetterBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["cover_letter"].body || ''}</pre>
                                     <button onclick="copyToClipboard('coverLetterBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
                                         <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>
                                 </div>
                             </div>` : ''}
-                            ${data.email_cover["linkedin_networking_message_recruiter"] ? `
+                            ${data.email_cover["linkdin_networking_message_recruiter"] ? `
                             <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fab fa-linkedin text-indigo-500"></i>
                                     LinkedIn Networking Message to Recruiter
                                 </h3>
                                 <div class="relative">
-                                    <pre id="linkedinRecruiterMessageBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["linkedin_networking_message_recruiter"].body || ''}</pre>
+                                    <pre id="linkedinRecruiterMessageBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["linkdin_networking_message_recruiter"].body || ''}</pre>
                                     <button onclick="copyToClipboard('linkedinRecruiterMessageBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
                                         <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>
                                 </div>
                             </div>` : ''}
-                            ${data.email_cover["linkedin_networking_message_hiring_manager"] ? `
+                            ${data.email_cover["linkdin_networking_message_referrer"] ? `
                             <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <i class="fab fa-linkedin text-indigo-500"></i>
-                                    LinkedIn Networking Message to Hiring Manager
+                                    LinkedIn Networking Message to Referer
                                 </h3>
                                 <div class="relative">
-                                    <pre id="linkedinHiringManagerMessageBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["linkedin_networking_message_hiring_manager"].body || ''}</pre>
+                                    <pre id="linkedinHiringManagerMessageBody" class="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-gray-800 text-sm">${data.email_cover["linkdin_networking_message_referrer"].body || ''}</pre>
                                     <button onclick="copyToClipboard('linkedinHiringManagerMessageBody', this)" class="absolute top-3 right-3 bg-indigo-600 text-white font-semibold py-1 px-3 rounded-md transition-colors text-sm hover:bg-indigo-700 flex items-center gap-1.5">
                                         <i class="fas fa-copy"></i> <span>Copy</span>
                                     </button>

@@ -2,7 +2,7 @@ import json
 import logging
 from prompts.email_cover_prompt import EMAIL_COVER_SCHEMA, EMAIL_COVER_TEMPLATE
 from utils.prompt_runner import run_json_prompt
-
+from app.schema.schema import EmailCoverSchema
 
 
 
@@ -40,7 +40,7 @@ class EmailGeneratorAgent:
         }
 
         try:
-            result = run_json_prompt(self.llm, EMAIL_COVER_TEMPLATE, prompt_inputs, EMAIL_COVER_SCHEMA)
+            result = run_json_prompt(self.llm, EMAIL_COVER_TEMPLATE, prompt_inputs, EmailCoverSchema)
             # print(result)
             return result
         except Exception as e:

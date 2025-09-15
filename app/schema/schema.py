@@ -15,10 +15,10 @@ class LinkedInMessage(BaseModel):
     body: str
 
 class EmailCoverSchema(BaseModel):
-    cold_email: ColdEmail = Field(..., alias="cold email")
-    cover_letter: CoverLetter = Field(..., alias="cover letter")
-    linkdin_networking_message_recruiter: LinkedInMessage
-    linkdin_networking_message_referrer: LinkedInMessage
+    cold_email: ColdEmail = Field(..., description="cold email")
+    cover_letter: CoverLetter = Field(..., description="cover letter")
+    linkdin_networking_message_recruiter: LinkedInMessage = Field(..., description="linkedin networking message to recruiter")
+    linkdin_networking_message_referrer: LinkedInMessage= Field(..., description="linkedin networking message to referrer")
 
 
 # ---------------- Fit Evaluator ----------------

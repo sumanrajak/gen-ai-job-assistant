@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Job Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-inter min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/timeline" class="text-xl font-bold text-indigo-600 flex items-center">
+                        <i class="fas fa-robot mr-2"></i>
+                        <span>GenAI Job Assistant</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                        <a href="/saved-jobs" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Saved Jobs</a>
+                        <a href="/" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Analysis</a>
+                        <a href="/country-list" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Country List</a>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <i id="menu-icon-bars" class="fas fa-bars h-6 w-6 block"></i>
+                        <i id="menu-icon-times" class="fas fa-times h-6 w-6 hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Saved Jobs</a>
+                <a href="#" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Analysis</a>
+                <a href="#" class="text-gray-600 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Country List</a>
+            </div>
+        </div>
+    </nav>
+    
+    <header class="w-full max-w-4xl mx-auto text-center my-8 p-4">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Job Hunt Dashboard</h1>
+        <div id="ist-clock" class="text-lg font-semibold text-indigo-600"></div>
+        <div class="flex justify-center space-x-4 mt-6">
+            <button id="active-now-btn" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow hover:bg-indigo-700">Active Now</button>
+            <button id="show-all-btn" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 bg-gray-200 text-gray-700 shadow hover:bg-gray-300">Show All</button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-4xl mx-auto flex-grow px-4">
+        <section id="active-now-section">
+            <h2 id="active-now-heading" class="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-indigo-400 inline-block">Active Now</h2>
+            <div id="active-now-cards" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2"></div>
+        </section>
+
+        <section id="next-up-section" class="mt-8">
+            <h2 id="next-up-heading" class="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-indigo-400 inline-block">Next Up</h2>
+            <div id="next-up-cards" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2"></div>
+        </section>
+    </main>
+
+    <footer class="w-full text-center mt-auto py-6 text-gray-500 text-sm">
+        <p>Built for job hunt across countries. All times are IST.</p>
+    </footer>
+
+    <script>
+        const countryData = {
+  "Canada": {
+    "salary_expectation": "CAD 85K - 120K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Indeed CA", "url": "https://ca.indeed.com/"},
+      {"name": "Workopolis", "url": "https://www.workopolis.com/"},
+      {"name": "Glassdoor", "url": "https://www.glassdoor.ca/"}
+    ],
+    "target_companies": ["Shopify", "Microsoft Canada", "Amazon Canada", "RBC", "TD Bank", "Google Canada"],
+    "visa_sponsorship": "Employer-Sponsored Work Permit / Express Entry",
+    "best_time_slots_IST": ["20:00 - 23:00", "23:00 - 03:00"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Canada",
+    "google_search": "Full Stack Developer jobs relocation Canada site:linkedin.com OR site:indeed.ca"
+  },
+  "United Kingdom": {
+    "salary_expectation": "£50K - £70K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Indeed UK", "url": "https://uk.indeed.com/"},
+      {"name": "CWJobs", "url": "https://www.cwjobs.co.uk/"},
+      {"name": "Glassdoor", "url": "https://www.glassdoor.co.uk/Job/index.htm"}
+    ],
+    "target_companies": ["IBM", "Accenture", "Capgemini", "JP Morgan", "Barclays", "Revolut", "Deliveroo", "Monzo"],
+    "visa_sponsorship": "Skilled Worker Visa",
+    "best_time_slots_IST": ["13:30 - 17:30", "20:00 - 21:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship United Kingdom",
+    "google_search": "Full Stack Developer jobs with visa sponsorship site:linkedin.com OR site:indeed.co.uk"
+  },
+  "Germany": {
+    "salary_expectation": "€60K - €80K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "StepStone", "url": "https://www.stepstone.de/"},
+      {"name": "Glassdoor", "url": "https://www.glassdoor.de/Job/"},
+      {"name": "Indeed DE", "url": "https://de.indeed.com/"}
+    ],
+    "target_companies": ["SAP", "Siemens", "Allianz", "Deutsche Bank", "Zalando", "Bosch", "Volkswagen IT"],
+    "visa_sponsorship": "EU Blue Card / Skilled Worker Visa",
+    "best_time_slots_IST": ["13:30 - 17:30", "20:00 - 21:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Germany",
+    "google_search": "Full Stack Developer jobs with visa relocation Germany site:linkedin.com OR site:stepstone.de"
+  },
+  "Australia": {
+    "salary_expectation": "AUD 100K - 140K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Seek AU", "url": "https://www.seek.com.au/"},
+      {"name": "Indeed AU", "url": "https://au.indeed.com/"},
+      {"name": "Glassdoor", "url": "https://www.glassdoor.com.au/Job/"}
+    ],
+    "target_companies": ["Atlassian", "Canva", "Commonwealth Bank", "ANZ", "Telstra", "Woolworths IT"],
+    "visa_sponsorship": "Temporary Skill Shortage (TSS) 482 Visa",
+    "best_time_slots_IST": ["06:30 - 09:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Australia",
+    "google_search": "Full Stack Developer jobs relocation Australia site:linkedin.com OR site:seek.com.au"
+  },
+  "Singapore": {
+    "salary_expectation": "SGD 75K - 120K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "JobStreet SG", "url": "https://www.jobstreet.com.sg/"},
+      {"name": "Indeed SG", "url": "https://sg.indeed.com/"},
+      {"name": "Glassdoor SG", "url": "https://www.glassdoor.com.sg/Job/"}
+    ],
+    "target_companies": ["Grab", "Shopee", "DBS Bank", "Amazon SG", "Google Singapore", "ByteDance SG"],
+    "visa_sponsorship": "Employment Pass (EP)",
+    "best_time_slots_IST": ["07:30 - 11:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Singapore",
+    "google_search": "Full Stack Developer jobs relocation Singapore site:linkedin.com OR site:jobstreet.com.sg"
+  },
+  "United Arab Emirates": {
+    "salary_expectation": "AED 220K - 320K/year (Tax Free)",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Bayt", "url": "https://www.bayt.com/"},
+      {"name": "Naukri Gulf", "url": "https://www.naukrigulf.com/"},
+      {"name": "Dubizzle Jobs", "url": "https://dubizzle.com/jobs/"}
+    ],
+    "target_companies": ["IBM", "Microsoft", "Amazon MENA", "Careem", "Noon", "Emirates NBD", "Etisalat"],
+    "visa_sponsorship": "Company Employment Visa",
+    "best_time_slots_IST": ["10:30 - 14:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Dubai OR Abu Dhabi",
+    "google_search": "Full Stack Developer jobs visa relocation UAE site:linkedin.com OR site:bayt.com"
+  },
+  "Netherlands": {
+    "salary_expectation": "€60K - €80K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "IamExpat Jobs", "url": "https://www.iamexpat.nl/career/jobs-netherlands"},
+      {"name": "Glassdoor NL", "url": "https://www.glassdoor.nl/Vacature/"},
+      {"name": "Indeed NL", "url": "https://nl.indeed.com/"}
+    ],
+    "target_companies": ["Booking.com", "Adyen", "ING", "ASML", "Philips", "Nike (Tech)", "Shell"],
+    "visa_sponsorship": "Highly Skilled Migrant Visa (Knowledge Migrant), 30% ruling",
+    "best_time_slots_IST": ["13:30 - 17:30", "20:00 - 21:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Netherlands",
+    "google_search": "Full Stack Developer jobs with visa relocation site:linkedin.com OR site:indeed.nl"
+  },
+  "Ireland": {
+    "salary_expectation": "€55K - €75K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "IrishJobs", "url": "https://www.irishjobs.ie/"},
+      {"name": "Indeed IE", "url": "https://ie.indeed.com/"},
+      {"name": "Glassdoor IE", "url": "https://www.glassdoor.ie/Job/"}
+    ],
+    "target_companies": ["Google Ireland", "Meta Ireland", "Accenture", "HubSpot", "Stripe", "LinkedIn EMEA"],
+    "visa_sponsorship": "Critical Skills Employment Permit",
+    "best_time_slots_IST": ["13:30 - 17:30", "20:00 - 21:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Ireland",
+    "google_search": "Full Stack Developer jobs with visa relocation site:linkedin.com OR site:irishjobs.ie"
+  },
+  "New Zealand": {
+    "salary_expectation": "NZD 85K - 110K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Seek NZ", "url": "https://www.seek.co.nz/"},
+      {"name": "Trade Me Jobs", "url": "https://www.trademe.co.nz/a/jobs"},
+      {"name": "Glassdoor NZ", "url": "https://www.glassdoor.co.nz/Job/"}
+    ],
+    "target_companies": ["Xero", "Datacom", "Fisher & Paykel", "Fonterra", "Weta Digital"],
+    "visa_sponsorship": "Accredited Employer Work Visa (AEWV)",
+    "best_time_slots_IST": ["06:30 - 09:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship New Zealand",
+    "google_search": "Full Stack Developer jobs relocation New Zealand site:linkedin.com OR site:seek.co.nz"
+  },
+  "Poland": {
+    "salary_expectation": "€30K - €55K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Pracuj.pl", "url": "https://www.pracuj.pl/"},
+      {"name": "Indeed PL", "url": "https://pl.indeed.com/"},
+      {"name": "Glassdoor PL", "url": "https://www.glassdoor.pl/Job/"}
+    ],
+    "target_companies": ["CD Projekt", "Allegro", "Comarch", "Intel Poland", "Google Warsaw"],
+    "visa_sponsorship": "Work Permit + EU Blue Card",
+    "best_time_slots_IST": ["13:30 - 17:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Poland",
+    "google_search": "Full Stack Developer jobs relocation Poland site:linkedin.com OR site:pracuj.pl"
+  },
+  "France": {
+    "salary_expectation": "€50K - €70K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Welcome to the Jungle", "url": "https://www.welcometothejungle.com/en"},
+      {"name": "Indeed FR", "url": "https://fr.indeed.com/"},
+      {"name": "Glassdoor FR", "url": "https://www.glassdoor.fr/Job/"}
+    ],
+    "target_companies": ["Capgemini", "Dassault Systèmes", "BNP Paribas", "Airbus", "Thales", "Orange"],
+    "visa_sponsorship": "Talent Passport / Skilled Worker Visa",
+    "best_time_slots_IST": ["13:30 - 17:30", "20:00 - 21:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship France",
+    "google_search": "Full Stack Developer jobs relocation France site:linkedin.com OR site:indeed.fr"
+  },
+  "Saudi Arabia": {
+    "salary_expectation": "SAR 200K - 300K/year (Tax Free)",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Bayt", "url": "https://www.bayt.com/"},
+      {"name": "GulfTalent", "url": "https://www.gulftalent.com/"},
+      {"name": "Naukri Gulf", "url": "https://www.naukrigulf.com/"}
+    ],
+    "target_companies": ["Saudi Aramco", "STC", "SABIC", "NEOM", "Al Rajhi Bank", "PwC KSA"],
+    "visa_sponsorship": "Company-Sponsored Iqama",
+    "best_time_slots_IST": ["10:30 - 14:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Saudi Arabia",
+    "google_search": "Full Stack Developer jobs relocation Saudi Arabia site:linkedin.com OR site:gulftalent.com"
+  },
+  "Qatar": {
+    "salary_expectation": "QAR 180K - 260K/year (Tax Free)",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "GulfTalent", "url": "https://www.gulftalent.com/"},
+      {"name": "Bayt", "url": "https://www.bayt.com/"},
+      {"name": "Naukri Gulf", "url": "https://www.naukrigulf.com/"}
+    ],
+    "target_companies": ["Qatar Airways", "Ooredoo", "QNB", "QatarEnergy"],
+    "visa_sponsorship": "Company Employment Visa",
+    "best_time_slots_IST": ["10:30 - 14:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Qatar",
+    "google_search": "Full Stack Developer jobs relocation Qatar site:linkedin.com OR site:gulftalent.com"
+  },
+  "Japan": {
+    "salary_expectation": "¥6M - ¥9M/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Daijob", "url": "https://www.daijob.com/en/"},
+      {"name": "Jobs in Japan", "url": "https://jobsinjapan.com/"},
+      {"name": "CareerCross", "url": "https://www.careercross.com/en/"}
+    ],
+    "target_companies": ["Rakuten", "Sony", "SoftBank", "LINE Corporation", "Toyota IT", "Mercari"],
+    "visa_sponsorship": "Engineer/Specialist in Humanities/International Services Visa",
+    "best_time_slots_IST": ["03:30 - 07:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Japan",
+    "google_search": "Full Stack Developer jobs relocation Japan site:linkedin.com OR site:daijob.com"
+  },
+  "South Korea": {
+    "salary_expectation": "₩55M - ₩85M/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "Job Korea", "url": "https://www.jobkorea.co.kr/"},
+      {"name": "Saramin", "url": "https://www.saramin.co.kr/"},
+      {"name": "Glassdoor KR", "url": "https://www.glassdoor.co.kr/Job/"}
+    ],
+    "target_companies": ["Samsung", "LG", "Naver", "Kakao", "Hyundai IT", "Coupang"],
+    "visa_sponsorship": "E-7 Work Visa",
+    "best_time_slots_IST": ["03:30 - 07:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship South Korea",
+    "google_search": "Full Stack Developer jobs relocation South Korea site:linkedin.com OR site:jobkorea.co.kr"
+  },
+  "Malaysia": {
+    "salary_expectation": "MYR 130K - 190K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "JobStreet MY", "url": "https://www.jobstreet.com.my/"},
+      {"name": "Indeed MY", "url": "https://my.indeed.com/"},
+      {"name": "Glassdoor MY", "url": "https://www.glassdoor.com.my/Job/"}
+    ],
+    "target_companies": ["Grab Malaysia", "AirAsia", "Maybank IT", "Maxis IT", "Petronas Digital"],
+    "visa_sponsorship": "Employment Pass Malaysia",
+    "best_time_slots_IST": ["07:30 - 11:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Malaysia",
+    "google_search": "Full Stack Developer jobs relocation Malaysia site:linkedin.com OR site:jobstreet.com.my"
+  },
+  "Bahrain": {
+    "salary_expectation": "BHD 15K - 24K/year",
+    "job_portals": [
+      {"name": "LinkedIn", "url": "https://www.linkedin.com/jobs/"},
+      {"name": "GulfTalent", "url": "https://www.gulftalent.com/"},
+      {"name": "Bayt", "url": "https://www.bayt.com/"},
+      {"name": "Naukri Gulf", "url": "https://www.naukrigulf.com/"}
+    ],
+    "target_companies": ["Batelco", "Gulf Air", "Bahrain FinTech Bay", "Almoayyed Computers", "Ahli United Bank"],
+    "visa_sponsorship": "Company Employment Visa",
+    "best_time_slots_IST": ["10:30 - 14:30"],
+    "linkedin_search": "site:linkedin.com/jobs Full Stack Developer visa sponsorship Bahrain",
+    "google_search": "Full Stack Developer jobs relocation Bahrain site:linkedin.com OR site:gulftalent.com"
+  }
+}
+
+        const activeNowBtn = document.getElementById('active-now-btn');
+        const showAllBtn = document.getElementById('show-all-btn');
+        const activeNowSection = document.getElementById('active-now-section');
+        const nextUpSection = document.getElementById('next-up-section');
+        const activeNowCardsContainer = document.getElementById('active-now-cards');
+        const nextUpCardsContainer = document.getElementById('next-up-cards');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIconBars = document.getElementById('menu-icon-bars');
+        const menuIconTimes = document.getElementById('menu-icon-times');
+
+        let isShowAll = false;
+
+        function updateISTClock() {
+            const now = new Date();
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const istTime = new Date(now.getTime() + istOffset - (now.getTimezoneOffset() * 60 * 1000));
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('ist-clock').textContent = istTime.toLocaleString('en-US', options) + ' IST';
+        }
+
+        function createCountryCard(countryName, data, status, countdown = '') {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-6 rounded-lg shadow-lg border border-gray-200 transition-transform hover:scale-105';
+
+            let statusBadgeClasses = 'py-1 px-3 rounded-full text-xs font-bold uppercase';
+            let statusText = '';
+            if (status === 'active') {
+                statusBadgeClasses += ' bg-green-500 text-white';
+                statusText = 'Active Now';
+            } else {
+                statusBadgeClasses += ' bg-yellow-400 text-gray-800';
+                statusText = `Next Up: ${countdown}`;
+            }
+
+            const portalsHtml = data.job_portals.map(p =>
+                `<a href="${p.url}" target="_blank" class="text-indigo-600 hover:underline font-semibold">${p.name}</a>`
+            ).join(', ');
+
+            const companiesHtml = data.target_companies.map(c =>
+                `<span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">${c}</span>`
+            ).join('');
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">${countryName}</h3>
+                    <span class="${statusBadgeClasses}">${statusText}</span>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Salary Expectation</p>
+                        <p class="font-semibold">${data.salary_expectation}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Visa Sponsorship</p>
+                        <p class="font-semibold">${data.visa_sponsorship}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Best IST Time Slots</p>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            ${data.best_time_slots_IST.map(slot => `<span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full">${slot}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Job Portals</p>
+                        <p>${portalsHtml}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Target Companies</p>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            ${companiesHtml}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <p class="font-semibold mb-2">Search Strings</p>
+                    <div class="space-y-4">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                            <span class="bg-gray-100 text-gray-600 text-xs p-2 rounded-md font-mono flex-grow overflow-x-auto whitespace-nowrap scrollbar-hide" id="linkedin-${countryName}">${data.linkedin_search}</span>
+                            <button class="flex-shrink-0 bg-indigo-500 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-indigo-600 transition-colors duration-200 copy-btn" data-target="linkedin-${countryName}">Copy</button>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                            <span class="bg-gray-100 text-gray-600 text-xs p-2 rounded-md font-mono flex-grow overflow-x-auto whitespace-nowrap scrollbar-hide" id="google-${countryName}">${data.google_search}</span>
+                            <button class="flex-shrink-0 bg-indigo-500 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-indigo-600 transition-colors duration-200 copy-btn" data-target="google-${countryName}">Copy</button>
+                            <a href="https://www.google.com/search?q=${encodeURIComponent(data.google_search)}" target="_blank" class="flex-shrink-0 bg-gray-300 text-gray-800 px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-gray-400 transition-colors duration-200 text-center">Open</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function parseTime(timeString) {
+            const [hours, minutes] = timeString.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function checkTimeSlot(timeSlots, currentMinutes) {
+            for (const slot of timeSlots) {
+                const [start, end] = slot.split(' - ').map(parseTime);
+                if (start <= end) {
+                    if (currentMinutes >= start && currentMinutes < end) {
+                        return true;
+                    }
+                } else { // Handle overnight slots
+                    if (currentMinutes >= start || currentMinutes < end) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function calculateCountdown(timeSlots, currentMinutes) {
+            let minDiff = Infinity;
+            let foundNextSlot = false;
+
+            for (const slot of timeSlots) {
+                const [start, end] = slot.split(' - ').map(parseTime);
+                let diff;
+                if (currentMinutes < start) {
+                    diff = start - currentMinutes;
+                } else { // Current time is past the slot for today
+                    const endToday = 24 * 60;
+                    const diffToday = endToday - currentMinutes + start;
+                    diff = diffToday;
+                }
+                if (diff > 0 && diff < minDiff) {
+                    minDiff = diff;
+                    foundNextSlot = true;
+                }
+            }
+
+            if (!foundNextSlot) {
+                return '24h 0m'; // Default if no future slots found
+            }
+
+            const hours = Math.floor(minDiff / 60);
+            const minutes = minDiff % 60;
+            return `${hours}h ${minutes}m`;
+        }
+
+        function updateDashboard() {
+            const now = new Date();
+            const istHours = now.getUTCHours() + 5;
+            const istMinutes = now.getUTCMinutes() + 30;
+            const currentMinutesIST = (istHours * 60) + istMinutes;
+
+            activeNowCardsContainer.innerHTML = '';
+            nextUpCardsContainer.innerHTML = '';
+
+            let activeCount = 0;
+            let nextUpCount = 0;
+
+            for (const [country, data] of Object.entries(countryData)) {
+                if (checkTimeSlot(data.best_time_slots_IST, currentMinutesIST)) {
+                    activeNowCardsContainer.appendChild(createCountryCard(country, data, 'active'));
+                    activeCount++;
+                } else {
+                    const countdown = calculateCountdown(data.best_time_slots_IST, currentMinutesIST);
+                    nextUpCardsContainer.appendChild(createCountryCard(country, data, 'next-up', countdown));
+                    nextUpCount++;
+                }
+            }
+            
+            document.getElementById('active-now-heading').textContent = `Active Now (${activeCount})`;
+            document.getElementById('next-up-heading').textContent = `Next Up (${nextUpCount})`;
+
+            handleFilter();
+        }
+
+        function handleFilter() {
+            if (isShowAll) {
+                activeNowSection.style.display = 'block';
+                nextUpSection.style.display = 'block';
+                activeNowBtn.classList.remove('bg-indigo-600', 'text-white');
+                activeNowBtn.classList.add('bg-gray-200', 'text-gray-700');
+                showAllBtn.classList.add('bg-indigo-600', 'text-white');
+                showAllBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            } else {
+                activeNowSection.style.display = 'block';
+                nextUpSection.style.display = 'none';
+                activeNowBtn.classList.add('bg-indigo-600', 'text-white');
+                activeNowBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                showAllBtn.classList.remove('bg-indigo-600', 'text-white');
+                showAllBtn.classList.add('bg-gray-200', 'text-gray-700');
+            }
+        }
+        
+        document.addEventListener('click', function(event) {
+            if (event.target.id === 'active-now-btn') {
+                isShowAll = false;
+                handleFilter();
+            } else if (event.target.id === 'show-all-btn') {
+                isShowAll = true;
+                handleFilter();
+            }
+            
+            if (event.target.classList.contains('copy-btn')) {
+                const targetId = event.target.dataset.target;
+                const textToCopy = document.getElementById(targetId).textContent;
+                
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.value = textToCopy;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextarea);
+
+                const originalText = event.target.textContent;
+                event.target.textContent = 'Copied!';
+                setTimeout(() => {
+                    event.target.textContent = originalText;
+                }, 1500);
+            }
+        });
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            menuIconBars.classList.toggle('hidden');
+            menuIconTimes.classList.toggle('hidden');
+        });
+
+        window.onload = function() {
+            updateISTClock();
+            setInterval(updateISTClock, 1000);
+            updateDashboard();
+            setInterval(updateDashboard, 30000);
+        };
+
+    </script>
+</body>
+</html>

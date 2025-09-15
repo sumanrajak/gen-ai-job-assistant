@@ -43,12 +43,7 @@ but if its written view or anguler then its not a critical missing requirement. 
 
 ### Output Instructions
 
-Respond **only** in valid JSON format strictly enclosed within `<json></json>` tags.  
-Do **not** include any explanations or content outside these tags.  
-Your response **must follow this schema**:
-```
-{schema}
-```
+
 Resume:
 {resume}
 

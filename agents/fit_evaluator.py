@@ -2,6 +2,7 @@ import json
 import logging
 from prompts.fit_evaluator_prompt import FIT_EVALUATOR_PROMPT_TEMPLATE, FIT_EVALUATOR_SCHEMA
 from utils.prompt_runner import run_json_prompt
+from app.schema.schema import FitEvaluatorSchema
 
 class FitEvaluatorAgent:
     def __init__(self, llm):
@@ -37,7 +38,7 @@ class FitEvaluatorAgent:
         }
 
         try:
-            result = run_json_prompt(self.llm, FIT_EVALUATOR_PROMPT_TEMPLATE, prompt_inputs, FIT_EVALUATOR_SCHEMA)
+            result = run_json_prompt(self.llm, FIT_EVALUATOR_PROMPT_TEMPLATE, prompt_inputs, FitEvaluatorSchema)
             return result
         except Exception as e:
             print(f"Error during fit evaluation: {e}")

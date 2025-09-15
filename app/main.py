@@ -31,6 +31,9 @@ async def saved_jobs_page():
 @app.get("/country-list")
 async def saved_jobs_page():
     return FileResponse("app/static/countries.html")
+@app.get("/timeline")
+async def saved_jobs_page():
+    return FileResponse("app/static/timeline.html")
 
 # Run via: uvicorn app.main:app --reload
 if __name__ == "__main__":
