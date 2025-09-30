@@ -11,7 +11,7 @@
     "summary": "Full Stack & AI Engineer with 4+ years of experience delivering scalable web applications and cutting-edge Generative AI solutions. Proven leader in full-stack development (FastAPI, Python, React) within robust cloud environments (AWS) and scalable database solutions. Expertise spans advanced Generative AI capabilities, including RAG, LLM integration, vector databases, and embedding-based search. Track record of leading modules, providing technical solutions, and building production-grade, end-to-end AI-powered features with optimized backend performance.",
     "technical_skills": {
       "languages": ["Python", "JavaScript (ES6+)", "TypeScript", "C++", "C", "HTML5", "CSS3"],
-      "frameworks_libraries": ["React", "Next.js", "Nest.js", "FastAPI", "Flask", "LangChain", "TensorFlow", "Electron.js"],
+      "frameworks_libraries": ["React", "Next.js", "Nest.js", "FastAPI", "Flask", "LangChain", "TensorFlow", "Electron.js","node.js"],
       "databases": ["MSSQL", "MySQL", "MongoDB", "DynamoDB", "Oracle"],
       "cloud_devops": ["AWS (EC2, Lambda, S3, AppSync, Bedrock, OpenSearch)"],
       "ai_ml": ["Generative AI", "RAG", "Embeddings", "AWS Bedrock", "OpenSearch similarity search", "AI Agents", "CNN/RNN", "Hugging Face"],

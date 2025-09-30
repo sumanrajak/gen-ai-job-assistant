@@ -31,6 +31,11 @@ async def saved_jobs_page():
 @app.get("/country-list")
 async def saved_jobs_page():
     return FileResponse("app/static/countries.html")
+
+@app.get("/analisis")
+async def saved_jobs_page():
+    return FileResponse("app/static/analisis.html")
+
 @app.get("/timeline")
 async def saved_jobs_page():
     return FileResponse("app/static/timeline.html")

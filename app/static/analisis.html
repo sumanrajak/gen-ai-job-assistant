@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full">
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-xl font-bold text-indigo-600 flex items-center">
+                        <i class="fas fa-robot mr-2"></i>
+                        <span>GenAI Job Assistant</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/saved-jobs" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Saved Jobs</a>
+                        <a href="/" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Analysis</a>
+                        <a href="/country-list" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Country List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8 text-center">Job Application Analytics</h1>
+            
+            <div id="analytics-dashboard" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Daily Activity Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 col-span-1 lg:col-span-2">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Daily Activity</h2>
+                    <canvas id="dailyActivityChart"></canvas>
+                </div>
+
+                <!-- Country-wise Daily Activity Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 col-span-1 lg:col-span-2">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Country-wise Daily Activity</h2>
+                    <canvas id="countryActivityChart"></canvas>
+                </div>
+
+                <!-- Fit Score Distribution -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Fit Score Distribution</h2>
+                    <canvas id="fitScoreDistributionChart"></canvas>
+                </div>
+
+                <!-- Job Status -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Overall Job Status</h2>
+                    <div class="max-h-64 flex justify-center items-center">
+                        <canvas id="jobStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Jobs by Country -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Jobs by Country</h2>
+                    <div class="max-h-64 flex justify-center items-center">
+                        <canvas id="jobsByCountryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Companies -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Top 5 Companies Applied To</h2>
+                    <ul id="topCompaniesList" class="space-y-3">
+                        <!-- List items will be injected here -->
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch("/api/saved-jobs");
+        if (!response.ok) {
+            throw new Error('Failed to fetch jobs data.');
+        }
+        const jobs = await response.json();
+        
+        if (jobs.length > 0) {
+            renderDailyActivityChart(jobs);
+            renderCountryActivityChart(jobs);
+            renderFitScoreDistribution(jobs);
+            renderTopCompanies(jobs);
+            renderJobsByCountry(jobs);
+            renderJobStatusChart(jobs);
+        } else {
+            document.getElementById('analytics-dashboard').innerHTML = '<p class="text-center text-gray-500 col-span-full">No job data available for analysis.</p>';
+        }
+    } catch (error) {
+        console.error("Error loading analytics:", error);
+        document.getElementById('analytics-dashboard').innerHTML = `<p class="text-center text-red-500 col-span-full">❌ Failed to load analytics. Please try again later.</p>`;
+    }
+});
+
+function renderDailyActivityChart(jobs) {
+    const dates = {};
+    jobs.forEach(job => {
+        const date = job["Date Saved"];
+        if (!dates[date]) {
+            dates[date] = { saved: 0, applied: 0 };
+        }
+        dates[date].saved++;
+        if (job.is_applied) {
+            dates[date].applied++;
+        }
+    });
+
+    const sortedDates = Object.keys(dates).sort();
+    const savedData = sortedDates.map(date => dates[date].saved);
+    const appliedData = sortedDates.map(date => dates[date].applied);
+
+    new Chart(document.getElementById('dailyActivityChart'), {
+        type: 'line',
+        data: {
+            labels: sortedDates,
+            datasets: [
+                {
+                    label: 'Jobs Saved',
+                    data: savedData,
+                    borderColor: 'rgb(79, 70, 229)',
+                    tension: 0.3,
+                },
+                {
+                    label: 'Jobs Applied',
+                    data: appliedData,
+                    borderColor: 'rgb(16, 185, 129)',
+                    tension: 0.3,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Jobs'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderCountryActivityChart(jobs) {
+    const activityByDateAndCountry = {};
+    const allCountries = new Set();
+
+    // Process the job data to group by date and country
+    jobs.forEach(job => {
+        const date = job["Date Saved"];
+        const country = job.location_country;
+
+        if (date && country) {
+            allCountries.add(country);
+
+            if (!activityByDateAndCountry[date]) {
+                activityByDateAndCountry[date] = {};
+            }
+            if (!activityByDateAndCountry[date][country]) {
+                activityByDateAndCountry[date][country] = 0;
+            }
+            activityByDateAndCountry[date][country]++;
+        }
+    });
+
+    const sortedDates = Object.keys(activityByDateAndCountry).sort();
+    const countryList = Array.from(allCountries).sort();
+
+    const colors = [
+        'rgb(79, 70, 229)', 'rgb(16, 185, 129)', 'rgb(251, 191, 36)', 'rgb(239, 68, 68)', 'rgb(59, 130, 246)',
+        'rgb(249, 115, 22)', 'rgb(139, 92, 246)', 'rgb(217, 70, 239)', 'rgb(107, 114, 128)', 'rgb(20, 83, 45)'
+    ];
+
+    const datasets = countryList.map((country, index) => {
+        const data = sortedDates.map(date => activityByDateAndCountry[date][country] || 0);
+        return {
+            label: country,
+            data: data,
+            borderColor: colors[index % colors.length],
+            tension: 0.3,
+            fill: false
+        };
+    });
+
+    new Chart(document.getElementById('countryActivityChart'), {
+        type: 'line',
+        data: {
+            labels: sortedDates,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+function renderFitScoreDistribution(jobs) {
+    const scores = jobs.map(job => parseInt(job.fit_score)).filter(score => !isNaN(score));
+    const scoreCounts = {};
+    scores.forEach(score => {
+        scoreCounts[score] = (scoreCounts[score] || 0) + 1;
+    });
+
+    const labels = Object.keys(scoreCounts).sort((a, b) => a - b);
+    const data = labels.map(label => scoreCounts[label]);
+
+    new Chart(document.getElementById('fitScoreDistributionChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Number of Jobs',
+                data: data,
+                backgroundColor: 'rgb(251, 191, 36)', // yellow-400
+                borderColor: 'rgb(251, 191, 36)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Jobs'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fit Score'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderTopCompanies(jobs) {
+    const companyCounts = {};
+    jobs.forEach(job => {
+        const company = job.company_name;
+        companyCounts[company] = (companyCounts[company] || 0) + 1;
+    });
+
+    const sortedCompanies = Object.entries(companyCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
+
+    const listElement = document.getElementById('topCompaniesList');
+    if (sortedCompanies.length === 0) {
+        listElement.innerHTML = '<li class="text-gray-500">No company data available.</li>';
+        return;
+    }
+    listElement.innerHTML = sortedCompanies.map(([company, count]) => `
+        <li class="flex justify-between items-center text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+            <span><i class="fas fa-briefcase text-sm mr-2 text-gray-500"></i>${company}</span>
+            <span class="font-semibold text-indigo-600 bg-indigo-100 px-2 py-1 rounded-md">${count}</span>
+        </li>
+    `).join('');
+}
+
+function renderJobsByCountry(jobs) {
+    const countryCounts = {};
+    jobs.forEach(job => {
+        const country = job.location_country;
+        if (country) {
+            countryCounts[country] = (countryCounts[country] || 0) + 1;
+        }
+    });
+
+    const labels = Object.keys(countryCounts);
+    const data = Object.values(countryCounts);
+    const backgroundColors = [
+        'rgb(79, 70, 229)', 'rgb(16, 185, 129)', 'rgb(251, 191, 36)', 'rgb(239, 68, 68)', 'rgb(59, 130, 246)',
+        'rgb(249, 115, 22)', 'rgb(139, 92, 246)', 'rgb(217, 70, 239)'
+    ];
+
+    new Chart(document.getElementById('jobsByCountryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+}
+
+function renderJobStatusChart(jobs) {
+    const appliedCount = jobs.filter(job => job.is_applied).length;
+    const pendingCount = jobs.length - appliedCount;
+
+    new Chart(document.getElementById('jobStatusChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Applied', 'Pending'],
+            datasets: [{
+                data: [appliedCount, pendingCount],
+                backgroundColor: [
+                    'rgb(16, 185, 129)', // green-500
+                    'rgb(251, 191, 36)'  // yellow-400
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+}
+</script>
+
+</body>
+</html>

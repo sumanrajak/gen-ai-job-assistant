@@ -66,13 +66,27 @@
         </h1>
 
         <!-- Search and Filter Controls -->
-        <div class="flex flex-col gap-4 mb-6">
-            <!-- Search Bar -->
-            <div class="relative w-full">
-                <input type="text" id="search-bar" placeholder="Search for jobs..."
-                       class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-search"></i>
+        <div class="flex flex-col gap-4 mb-8">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Search Bar -->
+                <div class="relative flex-grow">
+                    <input type="text" id="search-bar" placeholder="Search by title, company, location..."
+                           class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <!-- Date Filter -->
+                <div class="relative">
+                    <select id="date-filter" class="w-full sm:w-auto pl-4 pr-10 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none bg-white cursor-pointer">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="7days">Last 7 Days</option>
+                        <option value="30days">Last 30 Days</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 pointer-events-none">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
                 </div>
             </div>
 
@@ -102,6 +116,7 @@
         let currentJobs = [];
         let currentActiveFilter = 'All';
         let currentSearchQuery = '';
+        let currentDateFilter = 'all';
 
         async function fetchCountriesApi() {
             let countries= await fetch("/api/sheet-names");
@@ -281,12 +296,32 @@
          */
         function renderDashboard() {
             const container = document.getElementById("jobAccordion");
+
             const filteredJobs = currentJobs.filter(job => {
+                // Search filter
                 const matchesSearch = currentSearchQuery === '' || 
                                       job.Job_Title.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
                                       job.company_name.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
                                       job.location.toLowerCase().includes(currentSearchQuery.toLowerCase());
-                return matchesSearch;
+
+                // Date filter
+                let matchesDate = true;
+                if (currentDateFilter !== 'all') {
+                    const jobDate = new Date(job["Date Saved"]);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (currentDateFilter === 'today') {
+                        matchesDate = jobDate >= today;
+                    } else {
+                        const daysAgo = currentDateFilter === '7days' ? 7 : 30;
+                        const pastDate = new Date(today);
+                        pastDate.setDate(today.getDate() - daysAgo);
+                        matchesDate = jobDate >= pastDate;
+                    }
+                }
+
+                return matchesSearch && matchesDate;
             });
 
             if (!filteredJobs.length) {
@@ -543,6 +578,12 @@
             // Search bar listener
             document.getElementById('search-bar').addEventListener('input', (event) => {
                 currentSearchQuery = event.target.value;
+                renderDashboard();
+            });
+
+            // Date filter listener
+            document.getElementById('date-filter').addEventListener('change', (event) => {
+                currentDateFilter = event.target.value;
                 renderDashboard();
             });
 
